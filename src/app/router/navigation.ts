@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Settings,
   ShieldCheck,
+  UserCog,
   Users,
   Wallet,
   type LucideIcon,
@@ -45,6 +46,7 @@ import { STUDENT_PERMISSIONS } from '@/features/students/constants';
 import { TEACHER_PERMISSIONS } from '@/features/teachers/constants';
 import { TIMETABLE_PERMISSIONS } from '@/features/timetable/constants';
 import { TRANSPORT_PERMISSIONS } from '@/features/transport/constants';
+import { USER_PERMISSIONS } from '@/features/users/constants';
 
 import { PATHS } from './paths';
 
@@ -218,6 +220,12 @@ export const NAVIGATION: NavSection[] = [
   {
     title: 'Access control',
     items: [
+      {
+        label: 'Users',
+        to: PATHS.users,
+        icon: UserCog,
+        permissions: [USER_PERMISSIONS.read],
+      },
       {
         label: 'Roles',
         to: PATHS.roles,

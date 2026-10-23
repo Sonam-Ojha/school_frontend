@@ -58,10 +58,18 @@ interface AuthState {
   status: 'idle' | 'authenticated' | 'unauthenticated';
   /** Chosen at login; decides whether the session outlives the tab. */
   remember: boolean;
+  /**
+   * The history entry (`location.key`) the user deliberately signed out on,
+   * until the next sign-in. The route guard reads it so that leaving on
+   * purpose does not record that page as the place to come back to — the next
+   * person to sign in here may be somebody else, with other permissions. An
+   * expired session leaves it empty, and does return to where it broke off.
+   */
+  signedOutAt: string | null;
 
   setSession: (user: AuthUser, token: string | null, remember?: boolean) => void;
   setUser: (user: AuthUser) => void;
-  clearSession: () => void;
+  clearSession: (options?: { signedOutAt?: string }) => void;
   /** Marks boot-time session resolution as finished with no valid session. */
   setUnauthenticated: () => void;
 
@@ -78,6 +86,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       status: 'idle',
       remember: false,
+      signedOutAt: null,
 
       setSession: (user, token, remember) =>
         set((state) => ({
@@ -85,12 +94,19 @@ export const useAuthStore = create<AuthState>()(
           token,
           status: 'authenticated',
           remember: remember ?? state.remember,
+          signedOutAt: null,
         })),
 
       setUser: (user) => set({ user }),
 
-      clearSession: () =>
-        set({ user: null, token: null, status: 'unauthenticated', remember: false }),
+      clearSession: (options) =>
+        set({
+          user: null,
+          token: null,
+          status: 'unauthenticated',
+          remember: false,
+          signedOutAt: options?.signedOutAt ?? null,
+        }),
 
       setUnauthenticated: () => set({ status: 'unauthenticated' }),
 

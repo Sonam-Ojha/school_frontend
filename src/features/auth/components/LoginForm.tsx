@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LogIn } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { PATHS } from '@/app/router/paths';
 import { Form } from '@/components/form/Form';
@@ -15,16 +15,16 @@ import { applyServerErrors } from '@/lib/formErrors';
 import { useLogin } from '../hooks/useLogin';
 import { loginSchema, type LoginInput } from '../schemas';
 
-import { DevCredentialsHint } from './DevCredentialsHint';
-
 const FIELDS = ['email', 'password', 'remember'] as const;
 
 export function LoginForm() {
   const login = useLogin();
+  // A new school's sign-up sends its administrator here with the address filled in.
+  const [params] = useSearchParams();
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '', remember: false },
+    defaultValues: { email: params.get('email') ?? '', password: '', remember: false },
   });
 
   const onSubmit = (values: LoginInput) => {
@@ -57,16 +57,6 @@ export function LoginForm() {
         <Alert tone="warning" title="Too many attempts">
           {login.error instanceof ApiError ? login.error.message : ''}
         </Alert>
-      )}
-
-      {/* Dropped from production builds along with the mock API. */}
-      {import.meta.env.DEV && (
-        <DevCredentialsHint
-          onPick={(email, password) => {
-            form.setValue('email', email, { shouldValidate: true });
-            form.setValue('password', password, { shouldValidate: true });
-          }}
-        />
       )}
 
       <FormInput<LoginInput>

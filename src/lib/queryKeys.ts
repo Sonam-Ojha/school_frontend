@@ -14,6 +14,17 @@ export const queryKeys = {
     session: () => [...queryKeys.auth.all, 'session'] as const,
     /** Issued tokens / signed-in devices (`GET /auth/sessions`). */
     devices: () => [...queryKeys.auth.all, 'devices'] as const,
+    /** One-click demo accounts (`GET /auth/demo-accounts`). */
+    demoAccounts: () => [...queryKeys.auth.all, 'demo-accounts'] as const,
+  },
+  /** The platform, as the website and the schools see it (`/saas/…`). */
+  saas: {
+    all: ['saas'] as const,
+    config: () => [...queryKeys.saas.all, 'config'] as const,
+    plans: () => [...queryKeys.saas.all, 'plans'] as const,
+    school: (code: string) => [...queryKeys.saas.all, 'school', code] as const,
+    subscription: () => [...queryKeys.saas.all, 'subscription'] as const,
+    invoice: (id: number) => [...queryKeys.saas.all, 'invoice', id] as const,
   },
 } as const;
 

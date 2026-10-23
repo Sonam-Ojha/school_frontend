@@ -14,13 +14,16 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useClassOptions } from '@/features/academics/hooks/useAcademics';
 import { useDisclosure } from '@/hooks/useDisclosure';
-import { env } from '@/config/env';
 import { applyServerErrors } from '@/lib/formErrors';
 import { toast } from '@/store/toastStore';
 
 import { ATTENDANCE_TYPE_LABELS } from '../constants';
-import { useCreateQrSession, useQrSessions, useRevokeQrSession } from '../hooks/useDevices';
-import { deviceService } from '../services/deviceService';
+import {
+  useCreateQrSession,
+  useQrImage,
+  useQrSessions,
+  useRevokeQrSession,
+} from '../hooks/useDevices';
 import { qrSessionSchema, type QrSessionInput } from '../schemas';
 import type { QrSession } from '../types';
 
@@ -37,6 +40,7 @@ function minutesLeft(expiresAt: string): number {
 function SessionRow({ session, onRevoke }: { session: QrSession; onRevoke: () => void }) {
   // Recomputed on a timer so an expiring code visibly counts down.
   const [remaining, setRemaining] = useState(() => minutesLeft(session.expires_at));
+  const imageUrl = useQrImage(session);
 
   useEffect(() => {
     const timer = window.setInterval(() => setRemaining(minutesLeft(session.expires_at)), 30_000);
@@ -58,11 +62,15 @@ function SessionRow({ session, onRevoke }: { session: QrSession; onRevoke: () =>
     <li className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:px-6">
       {/* Rendered and signed by the backend — a client-generated code could be
           screenshotted and replayed, which the short expiry guards against. */}
-      <img
-        src={`${env.apiBaseUrl}${deviceService.qrImageUrl(session)}`}
-        alt={`Check-in code for ${ATTENDANCE_TYPE_LABELS[session.type]}`}
-        className="size-28 shrink-0 rounded-lg border border-slate-200 bg-white p-1"
-      />
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={`Check-in code for ${ATTENDANCE_TYPE_LABELS[session.type]}`}
+          className="size-28 shrink-0 rounded-lg border border-slate-200 bg-white p-1"
+        />
+      ) : (
+        <Skeleton className="size-28 shrink-0 rounded-lg" />
+      )}
 
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-slate-900">

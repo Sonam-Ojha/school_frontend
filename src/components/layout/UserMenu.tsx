@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { PATHS } from '@/app/router/paths';
 import { Avatar } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
 import { useDisclosure } from '@/hooks/useDisclosure';
 import { useDismiss } from '@/hooks/useDismiss';
 import { cn } from '@/lib/cn';
@@ -66,6 +67,11 @@ export function UserMenu({ onSignOut, isSigningOut = false }: UserMenuProps) {
               <p className="mt-1 truncate text-xs text-brand-600 capitalize">
                 {user.roles.join(', ').replace(/-/g, ' ')}
               </p>
+            )}
+            {user.is_demo && (
+              <Badge tone="warning" className="mt-2">
+                Demo account
+              </Badge>
             )}
           </div>
 

@@ -21,8 +21,6 @@
     "noUncheckedSideEffectImports": true,
     "noImplicitOverride": true,
     "exactOptionalPropertyTypes": false,
-
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

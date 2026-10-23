@@ -69,9 +69,10 @@ misconfigured deploy fails immediately instead of surfacing as a confusing 404.
 
 | Module | Routes | Notes |
 | ------ | ------ | ----- |
+| `features/landing` | `/` | The public page about the project: what it is, its modules and roles, how it is built, and a Login button. Open to everybody, signed in or not. Its copy lives in `content.ts` |
 | `features/dashboard` | `/dashboard` | The landing screen, shaped by who is looking: admin, principal, teacher, student and parent views over one route, with permission-filtered cards, charts, lists and a recent-activity feed |
 | `features/notifications` | `/notifications`, `/notifications/preferences` | The per-user inbox behind the top-bar bell: unread count, full history with filters, per-kind email and SMS opt-in, and a record of how every copy went out |
-| `features/auth` | `/login`, `/forgot-password`, `/reset-password/:token`, `/profile` | Sanctum sign-in, password reset/change, profile, signed-in devices |
+| `features/auth` | `/login`, `/forgot-password`, `/reset-password/:token`, `/profile` | Sanctum sign-in, one-click demo accounts, password reset/change, profile, signed-in devices |
 | `features/roles` | `/roles`, `/roles/create`, `/roles/:id/edit`, `/permissions` | Spatie roles CRUD, resource × action permission matrix |
 | `features/settings` | `/settings/{profile,address,sessions,regional,email,sms}` | School profile, logo, academic sessions, timezone/currency, SMTP, SMS |
 | `features/students` | `/students`, `/students/admission`, `/students/:id/*` | Admission wizard, profile tabs, guardians, medical, documents, ID card, exports |
@@ -216,6 +217,14 @@ never a default dashboard.
   "sign out everywhere".
 - **Role-based landing** — `features/auth/roleRoutes.ts` maps roles to a post-login home
   route. Add an entry there as each module ships; unmatched roles fall back to the dashboard.
+- **Where a sign-in lands** — a visitor sent to `/login` from a protected page, or whose
+  session expired, returns to that page afterwards. Signing out on purpose leaves no such
+  return address, so whoever signs in next starts on their own home page.
+- **Demo accounts** — when the server offers any (`GET /auth/demo-accounts`), the sign-in page
+  lists them beside the form and one click signs in as that person, with nothing typed. The
+  server decides which accounts allow it and what they may not do; a session from one carries
+  `is_demo: true` on the user, which the account menu, profile and Users screen label. With no
+  demo accounts the page is the sign-in form alone.
 - `VITE_AUTH_MODE=token` (default) sends a Sanctum bearer token; `cookie` switches to SPA
   cookie sessions with CSRF and requires same-site domains. `authService` handles both.
 
@@ -233,7 +242,11 @@ PUT    /auth/profile            { name, email, phone }                     → {
 POST   /auth/profile/avatar     multipart: avatar                          → { data: user }
 GET    /auth/sessions                                                      → { data: token[] }
 DELETE /auth/sessions/{id}                                                 → 204
+GET    /auth/demo-accounts      public                                     → { data: { email, name, role }[] }
+POST   /auth/demo-login         public: { email, device_name }             → { data: { user, token } }
 ```
+
+The two demo routes are optional: a server without them simply shows no demo accounts.
 
 The user resource must include `roles` and `permissions` as string arrays (Spatie), plus
 `phone`, `avatar_url` and `email_verified_at`.

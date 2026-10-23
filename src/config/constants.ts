@@ -1,6 +1,17 @@
-/** Storage keys — namespaced so multiple apps can share an origin safely. */
+import { schoolCode } from '@/app/tenant';
+
+/** Where a school's session is kept on this device. */
+export const schoolSessionKey = (code: string): string => `school-erp.auth.${code}`;
+
+/**
+ * Storage keys — namespaced so multiple apps can share an origin safely.
+ *
+ * The session is kept per school: being signed in to one school says nothing
+ * about another, and its token must never be sent to one.
+ */
 export const STORAGE_KEYS = {
-  auth: 'school-erp.auth',
+  auth: schoolCode ? schoolSessionKey(schoolCode) : 'school-erp.auth',
+  platformAuth: 'school-erp.platform-auth',
   ui: 'school-erp.ui',
 } as const;
 

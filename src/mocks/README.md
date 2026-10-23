@@ -258,11 +258,12 @@ on a full page reload.
 
 ## Removing it
 
-Three steps:
+Two steps:
 
 1. Delete `src/mocks/`.
 2. Delete the `if (import.meta.env.DEV) { … }` block in `src/main.tsx`.
-3. Delete `src/features/auth/components/DevCredentialsHint.tsx` and the `import.meta.env.DEV`
-   block that renders it in `src/features/auth/components/LoginForm.tsx`.
 
 Then point `VITE_API_BASE_URL` at the real API. Nothing else in the app knows the mock exists.
+The demo accounts on the sign-in page are not part of it: they come from `GET /auth/demo-accounts`,
+which the mock answers with its own accounts and a real server answers from its `DEMO_LOGIN`
+setting.

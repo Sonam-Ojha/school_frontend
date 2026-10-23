@@ -72,5 +72,19 @@ export const qrSessionSchema = z.object({
 
 export type AttendanceMarkInput = z.infer<typeof attendanceMarkSchema>;
 export type AttendanceSheetInput = z.infer<typeof attendanceSheetSchema>;
+/** Registering an attendance reader. */
+export const deviceSchema = z.object({
+  name: z.string().min(2, 'Name the reader').max(80, 'Name is too long'),
+  serial_number: z
+    .string()
+    .min(3, 'The serial number is required')
+    .max(40, 'Serial number is too long')
+    .regex(/^[A-Za-z0-9_-]+$/, 'Use letters, numbers and hyphens only'),
+  location: optionalText(100, 'Location is too long'),
+  /** Edit only: cut the old key off and issue a new one. */
+  regenerate_key: z.boolean(),
+});
+
+export type DeviceInput = z.infer<typeof deviceSchema>;
 export type HolidayInput = z.infer<typeof holidaySchema>;
 export type QrSessionInput = z.infer<typeof qrSessionSchema>;

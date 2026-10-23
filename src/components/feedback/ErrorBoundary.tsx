@@ -1,6 +1,7 @@
 import { RefreshCw } from 'lucide-react';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
+import { area, platformUrl, schoolUrl } from '@/app/tenant';
 import { Button } from '@/components/ui/Button';
 import { env } from '@/config/env';
 
@@ -66,7 +67,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <Button onClick={this.reset} leftIcon={<RefreshCw className="size-4" />}>
             Try again
           </Button>
-          <Button variant="outline" onClick={() => window.location.assign('/')}>
+          <Button
+            variant="outline"
+            onClick={() =>
+              window.location.assign(
+                area.kind === 'school' ? schoolUrl(area.code, '/dashboard') : area.kind === 'platform' ? platformUrl('/dashboard') : '/',
+              )
+            }
+          >
             Go to dashboard
           </Button>
         </div>

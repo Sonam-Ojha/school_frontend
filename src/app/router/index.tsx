@@ -19,6 +19,7 @@ import { ATTENDANCE_PERMISSIONS } from '@/features/attendance/constants';
 import { FEE_PERMISSIONS } from '@/features/fees/constants';
 import { HOMEWORK_PERMISSIONS } from '@/features/homework/constants';
 import { PERMISSION_PERMISSIONS, ROLE_PERMISSIONS } from '@/features/roles/constants';
+import { USER_PERMISSIONS } from '@/features/users/constants';
 import { SETTINGS_PERMISSIONS } from '@/features/settings/constants';
 import { STAFF_PERMISSIONS } from '@/features/staff/constants';
 import { STUDENT_PERMISSIONS } from '@/features/students/constants';
@@ -37,6 +38,10 @@ import { TeacherTabRedirect } from './TeacherTabRedirect';
  * Pages are code-split per route so a module's bundle only loads when it is
  * first visited. Feature modules add their routes to `protectedRoutes` and
  * their sidebar entry in `navigation.ts` — nothing else needs changing.
+ *
+ * Three kinds of route: the landing page at `/`, open to everybody; guest
+ * routes (sign-in, password reset), which a signed-in user is sent away from;
+ * and everything else, which needs a session.
  */
 
 const guestRoutes: RouteObject[] = [
@@ -59,7 +64,6 @@ const guestRoutes: RouteObject[] = [
 ];
 
 const protectedRoutes: RouteObject[] = [
-  { index: true, element: <Navigate to={PATHS.dashboard} replace /> },
   // One route, five views — the dashboard resolves which from the signed-in
   // user's roles, so there is no URL a user can reach and not be allowed to see.
   {
@@ -91,6 +95,14 @@ const protectedRoutes: RouteObject[] = [
   {
     path: PATHS.forbidden,
     lazy: async () => ({ Component: (await import('@/pages/ForbiddenPage')).default }),
+  },
+  // Where a scanned attendance code lands. No permission: anybody on a roster
+  // may check themselves in, and the server decides whether this code is theirs.
+  {
+    path: PATHS.checkIn,
+    lazy: async () => ({
+      Component: (await import('@/features/attendance/pages/CheckInPage')).default,
+    }),
   },
   // Students
   {
@@ -959,6 +971,17 @@ const protectedRoutes: RouteObject[] = [
   },
   // Access control — guarded by permission, not just by being signed in.
   {
+    element: <ProtectedRoute permissions={[USER_PERMISSIONS.read]} />,
+    children: [
+      {
+        path: PATHS.users,
+        lazy: async () => ({
+          Component: (await import('@/features/users/pages/UserListPage')).default,
+        }),
+      },
+    ],
+  },
+  {
     element: <ProtectedRoute permissions={[ROLE_PERMISSIONS.read]} />,
     children: [
       {
@@ -1051,18 +1074,33 @@ const protectedRoutes: RouteObject[] = [
   },
 ];
 
-export const router = createBrowserRouter([
-  {
-    errorElement: <RouteErrorBoundary />,
-    children: [
+/**
+ * One school's application, served under its code: `/greenwood/students`.
+ *
+ * Every path in `PATHS` is relative to that base, so links inside the app
+ * never mention the school — the router adds it. The school's own home,
+ * `/greenwood`, opens the dashboard, or the sign-in page for a visitor.
+ */
+export function createSchoolRouter(code: string) {
+  return createBrowserRouter(
+    [
       {
-        element: <PublicRoute />,
-        children: [{ element: <AuthLayout />, children: guestRoutes }],
-      },
-      {
-        element: <ProtectedRoute />,
-        children: [{ element: <AppLayout />, children: protectedRoutes }],
+        errorElement: <RouteErrorBoundary />,
+        children: [
+          {
+            element: <PublicRoute />,
+            children: [{ element: <AuthLayout />, children: guestRoutes }],
+          },
+          {
+            element: <ProtectedRoute />,
+            children: [
+              { path: PATHS.root, element: <Navigate to={PATHS.dashboard} replace /> },
+              { element: <AppLayout />, children: protectedRoutes },
+            ],
+          },
+        ],
       },
     ],
-  },
-]);
+    { basename: `/${code}` },
+  );
+}

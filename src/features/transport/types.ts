@@ -170,6 +170,15 @@ export interface GpsDevice {
 }
 
 /**
+ * A tracker as the API returns it from a save. `push_key` is present only
+ * when one was just issued — on registering, or when a new one is asked for —
+ * and is never returned again.
+ */
+export interface RegisteredGpsDevice extends GpsDevice {
+  push_key?: string;
+}
+
+/**
  * Where a bus is now.
  *
  * `is_stale` rather than a client-side timestamp comparison: whether a fix is

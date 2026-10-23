@@ -9,6 +9,17 @@ export interface LoginResponseData {
 }
 
 /**
+ * A demo account offered on the sign-in page, as listed by
+ * `GET /auth/demo-accounts`. Entered with one click — there is no password.
+ */
+export interface DemoAccount {
+  email: string;
+  name: string;
+  /** Role slug, e.g. `teacher`. */
+  role: string;
+}
+
+/**
  * One issued Sanctum personal access token, as listed by `GET /auth/sessions`.
  * Powers the "signed-in devices" panel on the profile page.
  */

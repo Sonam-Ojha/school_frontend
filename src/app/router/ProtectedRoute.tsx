@@ -16,13 +16,14 @@ interface ProtectedRouteProps {
  * Gate for authenticated areas.
  *
  * Renders a loader while the session is still resolving, bounces anonymous
- * users to login (remembering where they came from), and sends
- * authenticated-but-unauthorised users to the 403 page rather than login —
- * signing in again would not help them.
+ * users to login (remembering where they were headed, unless they have just
+ * signed out), and sends authenticated-but-unauthorised users to the 403 page
+ * rather than login — signing in again would not help them.
  */
 export function ProtectedRoute({ roles, permissions }: ProtectedRouteProps) {
   const location = useLocation();
   const status = useAuthStore((state) => state.status);
+  const signedOutAt = useAuthStore((state) => state.signedOutAt);
   const hasAnyRole = useAuthStore((state) => state.hasAnyRole);
   const hasAnyPermission = useAuthStore((state) => state.hasAnyPermission);
 
@@ -31,7 +32,12 @@ export function ProtectedRoute({ roles, permissions }: ProtectedRouteProps) {
   }
 
   if (status === 'unauthenticated') {
-    return <Navigate to={PATHS.login} state={{ from: location }} replace />;
+    // Signing out here on purpose is not "being headed here": no return
+    // address, so whoever signs in next starts from their own home page.
+    const leftOnPurpose = signedOutAt === location.key;
+    return (
+      <Navigate to={PATHS.login} state={leftOnPurpose ? null : { from: location }} replace />
+    );
   }
 
   const roleAllowed = !roles || hasAnyRole(roles);

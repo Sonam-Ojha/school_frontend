@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { PATHS } from '@/app/router/paths';
 import { useAuthStore } from '@/store/authStore';
@@ -21,6 +21,7 @@ interface UseLogoutOptions {
  */
 export function useLogout({ allDevices = false }: UseLogoutOptions = {}) {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const clearSession = useAuthStore((state) => state.clearSession);
 
@@ -28,7 +29,9 @@ export function useLogout({ allDevices = false }: UseLogoutOptions = {}) {
     mutationFn: () => (allDevices ? authService.logoutAll() : authService.logout()),
 
     onSettled: () => {
-      clearSession();
+      // Naming the page tells the route guard this was a deliberate exit, so
+      // it does not keep the page as somewhere to return to after sign-in.
+      clearSession({ signedOutAt: location.key });
       queryClient.clear();
       navigate(PATHS.login, { replace: true });
       toast.success(allDevices ? 'Signed out on all devices' : 'You have been signed out');

@@ -5,23 +5,20 @@ import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Toaster } from '@/components/feedback/Toaster';
 import { queryClient } from '@/lib/queryClient';
 
-import { SessionProvider } from './SessionProvider';
-
 /**
- * Application-wide providers, outermost first:
- * error boundary → server cache → session → UI outlets.
+ * Providers every part of the product shares, outermost first:
+ * error boundary → server cache → UI outlets.
  *
  * The boundary wraps everything so a provider-level crash still renders a
- * recoverable screen instead of a blank page.
+ * recoverable screen instead of a blank page. A school's session is added by
+ * the school's own app (`SchoolApp`), inside the check that the school exists.
  */
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          {children}
-          <Toaster />
-        </SessionProvider>
+        {children}
+        <Toaster />
       </QueryClientProvider>
     </ErrorBoundary>
   );

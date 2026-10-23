@@ -13,18 +13,22 @@ export class ApiError extends Error {
   readonly status: number;
   readonly errors: Record<string, string[]>;
   readonly isNetworkError: boolean;
+  /** The platform's reason for a subscription refusal, e.g. `subscription_expired`. */
+  readonly code: string | null;
 
   constructor(
     message: string,
     status: number,
     errors: Record<string, string[]> = {},
     isNetworkError = false,
+    code: string | null = null,
   ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.errors = errors;
     this.isNetworkError = isNetworkError;
+    this.code = code;
   }
 
   /** 422 — Laravel FormRequest rejected the payload. */
@@ -88,6 +92,8 @@ export function toApiError(error: unknown): ApiError {
       data?.message?.trim() || STATUS_MESSAGES[status] || DEFAULT_MESSAGE,
       status,
       data?.errors ?? {},
+      false,
+      typeof data?.code === 'string' ? data.code : null,
     );
   }
 

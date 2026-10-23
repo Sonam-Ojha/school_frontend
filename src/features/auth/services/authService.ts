@@ -9,7 +9,12 @@ import type {
   ResetPasswordInput,
   UpdateProfileInput,
 } from '../schemas';
-import type { AuthSessionToken, LoginResponseData, MessageResponse } from '../types';
+import type {
+  AuthSessionToken,
+  DemoAccount,
+  LoginResponseData,
+  MessageResponse,
+} from '../types';
 
 /**
  * Label the issued Sanctum token so the user can recognise it in the
@@ -54,6 +59,29 @@ export const authService = {
       email: normaliseEmail(input.email),
       password: input.password,
       remember: input.remember,
+      device_name: deviceName(),
+    });
+
+    return data.data;
+  },
+
+  /**
+   * The demo accounts this installation offers. An empty list is the normal
+   * answer: a real school has demo sign-in switched off.
+   */
+  async demoAccounts(signal?: AbortSignal): Promise<DemoAccount[]> {
+    const { data } = await http.get<CollectionResponse<DemoAccount>>('/auth/demo-accounts', {
+      signal,
+    });
+    return data.data;
+  },
+
+  /** Signs in to a demo account. No password: the server decides which accounts allow it. */
+  async demoLogin(email: string): Promise<LoginResponseData> {
+    await ensureCsrfCookie();
+
+    const { data } = await http.post<ApiResource<LoginResponseData>>('/auth/demo-login', {
+      email: normaliseEmail(email),
       device_name: deviceName(),
     });
 

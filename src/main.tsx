@@ -15,7 +15,10 @@ async function bootstrap() {
   // first request fires. `import.meta.env.DEV` is replaced with `false` at
   // build time, so this branch and the entire `src/mocks/` chunk are dropped
   // from production bundles. Delete both lines once the backend is live.
-  if (import.meta.env.DEV) {
+  //
+  // Set `VITE_USE_MOCK_API=false` in `.env` to skip it in development and
+  // talk to the real API (and its MySQL database) instead.
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API !== 'false') {
     const { installDevApi } = await import('./mocks/devApi');
     installDevApi();
   }

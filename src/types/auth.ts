@@ -13,6 +13,31 @@ export interface AuthUser {
   roles: string[];
   permissions: string[];
   created_at: string;
+  /**
+   * True on a shared demo account, entered with one click from the sign-in
+   * page. The API refuses it account, role and mail changes; the UI labels
+   * the session so that a refusal is no surprise.
+   */
+  is_demo?: boolean;
+  /**
+   * The roster records this account belongs to: a parent's children (or the
+   * one student a student account is), and a teacher's or staff member's own
+   * record. Set by an administrator on the Users screen.
+   */
+  links?: UserLinks;
+  /**
+   * Permissions held only through a family role (parent, student). The API
+   * answers these with the family's own children's records, never the school's.
+   */
+  scoped_permissions?: string[];
+  /** True when every role the user holds is a family role. */
+  is_portal?: boolean;
+}
+
+export interface UserLinks {
+  student_ids: number[];
+  teacher_id: number | null;
+  staff_id: number | null;
 }
 
 export interface AuthSession {

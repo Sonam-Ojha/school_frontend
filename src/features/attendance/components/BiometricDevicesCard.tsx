@@ -1,36 +1,58 @@
-import { Fingerprint, MapPin, RefreshCw } from 'lucide-react';
+import { Fingerprint, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Can } from '@/components/ui/Can';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { formatDateTime } from '@/lib/format';
 
-import { DEVICE_STATUS_LABELS, DEVICE_STATUS_TONES } from '../constants';
-import { useBiometricDevices, useSyncDevice } from '../hooks/useDevices';
+import { ATTENDANCE_PERMISSIONS, DEVICE_STATUS_LABELS, DEVICE_STATUS_TONES } from '../constants';
+import { useBiometricDevices, useDeleteDevice } from '../hooks/useDevices';
+import type { BiometricDevice, RegisteredDevice } from '../types';
+
+import { DeviceFormModal } from './DeviceFormModal';
+import { DeviceKeyDialog } from './DeviceKeyDialog';
 
 /**
- * Biometric readers and their health.
+ * Attendance readers and their health.
  *
- * Devices push punches to the backend on their own schedule; this screen
- * exists so someone can see a reader has gone quiet and pull its buffer
- * manually. Nothing is read from the device by the browser — that is the
- * backend's job, and the reason this is "biometric ready" rather than
- * "biometric capture".
+ * A reader sends its scans to the server by itself, as they happen; nothing
+ * is read from the device by the browser. This screen is where a reader is
+ * registered — scans from one that is not are refused — and where somebody
+ * can see that a reader has gone quiet, or that people are scanning under
+ * numbers the school does not know.
  */
 export function BiometricDevicesCard() {
   const { data: devices, isLoading, error } = useBiometricDevices();
-  const syncDevice = useSyncDevice();
-  const [syncingId, setSyncingId] = useState<number | null>(null);
+  const deleteDevice = useDeleteDevice();
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<BiometricDevice | null>(null);
+  const [removing, setRemoving] = useState<BiometricDevice | null>(null);
+  const [issued, setIssued] = useState<RegisteredDevice | null>(null);
+
+  const openForm = (device: BiometricDevice | null) => {
+    setEditing(device);
+    setFormOpen(true);
+  };
 
   return (
     <Card>
       <CardHeader
         title="Biometric devices"
-        description="Fingerprint and face readers that push punches into attendance."
+        description="Fingerprint, face and card readers that send their scans into attendance."
+        actions={
+          <Can permissions={[ATTENDANCE_PERMISSIONS.approve]}>
+            <Button size="sm" onClick={() => openForm(null)} leftIcon={<Plus className="size-4" />}>
+              Register a reader
+            </Button>
+          </Can>
+        }
       />
 
       <CardBody className="p-0">
@@ -81,42 +103,84 @@ export function BiometricDevicesCard() {
                         </span>
                       )}
                       <span>
-                        Last sync {formatDateTime(device.last_sync_at, 'never')}
-                        {device.last_sync_count > 0 && ` · ${device.last_sync_count} punches`}
+                        Last heard from {formatDateTime(device.last_sync_at, 'never')}
+                        {device.last_sync_count > 0 && ` · ${device.last_sync_count} scans`}
                       </span>
                     </p>
 
                     {device.error_message && (
                       <p className="mt-1 text-xs text-red-600">{device.error_message}</p>
                     )}
+                    {device.unknown_ids && device.unknown_ids.length > 0 && (
+                      <p className="mt-1 text-xs text-amber-700">
+                        Scans from numbers nobody is enrolled under: {device.unknown_ids.join(', ')}.
+                        Enrol people under their admission number or employee ID.
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 self-start sm:self-auto"
-                  disabled={device.status === 'offline'}
-                  isLoading={syncDevice.isPending && syncingId === device.id}
-                  onClick={() => {
-                    setSyncingId(device.id);
-                    syncDevice.mutate(device.id, { onSettled: () => setSyncingId(null) });
-                  }}
-                  leftIcon={<RefreshCw className="size-4" />}
-                >
-                  Sync now
-                </Button>
+                <Can permissions={[ATTENDANCE_PERMISSIONS.approve]}>
+                  <div className="flex shrink-0 items-center gap-1 self-start sm:self-auto">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      aria-label={`Edit ${device.name}`}
+                      onClick={() => openForm(device)}
+                      leftIcon={<Pencil className="size-4" />}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      aria-label={`Remove ${device.name}`}
+                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => setRemoving(device)}
+                      leftIcon={<Trash2 className="size-4" />}
+                    />
+                  </div>
+                </Can>
               </li>
             ))}
           </ul>
         ) : (
           <EmptyState
             icon={<Fingerprint className="size-6" />}
-            title="No devices registered"
-            description="Register a reader from the device itself; it appears here once it first reports in."
+            title="No readers registered"
+            description="Register each reader here with its serial number, then point the reader at this server. Its scans are refused until it is registered."
           />
         )}
       </CardBody>
+
+      {formOpen && (
+        <DeviceFormModal
+          isOpen
+          device={editing}
+          onClose={() => setFormOpen(false)}
+          onKeyIssued={setIssued}
+        />
+      )}
+
+      <DeviceKeyDialog device={issued} onClose={() => setIssued(null)} />
+
+      <ConfirmDialog
+        isOpen={removing !== null}
+        onClose={() => setRemoving(null)}
+        onConfirm={() => {
+          if (removing) deleteDevice.mutate(removing.id, { onSettled: () => setRemoving(null) });
+        }}
+        title="Remove this reader?"
+        message={
+          <>
+            Scans from <strong>{removing?.name}</strong> will be refused from now on. Attendance it
+            has already recorded stays as it is.
+          </>
+        }
+        confirmLabel="Remove"
+        isDestructive
+        isLoading={deleteDevice.isPending}
+      />
     </Card>
   );
 }

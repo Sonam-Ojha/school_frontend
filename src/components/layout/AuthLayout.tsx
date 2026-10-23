@@ -1,21 +1,49 @@
-import { GraduationCap } from 'lucide-react';
+import { ArrowLeft, GraduationCap } from 'lucide-react';
 import { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
+import { PATHS } from '@/app/router/paths';
 import { Spinner } from '@/components/ui/Spinner';
 import { env } from '@/config/env';
+import { useSchool } from '@/features/saas/SchoolContext';
 
-/** Centred, chrome-free shell for guest screens (login, password reset). */
+/**
+ * Centred, chrome-free shell for guest screens (login, password reset).
+ *
+ * Branded with the school whose address this is, so a parent can see they
+ * are signing in to the right one. One narrow column by default; a page that
+ * needs more room — the sign-in page with demo accounts beside the form —
+ * marks its root with `data-wide`.
+ */
 export function AuthLayout() {
+  const { code, info } = useSchool();
+  const name = info?.name ?? env.appName;
+
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <span className="flex size-12 items-center justify-center rounded-xl bg-brand-600 text-white">
-            <GraduationCap className="size-6" aria-hidden />
-          </span>
-          <h1 className="mt-3 text-lg font-semibold text-slate-900">{env.appName}</h1>
-        </div>
+      <div className="w-full max-w-sm has-[[data-wide]]:max-w-4xl">
+        <Link
+          to={PATHS.login}
+          className="mx-auto mb-8 flex w-fit flex-col items-center rounded-lg text-center"
+        >
+          {info?.logo_url ? (
+            <img
+              src={info.logo_url}
+              alt=""
+              className="size-14 rounded-xl border border-slate-200 bg-white object-contain p-1"
+            />
+          ) : (
+            <span className="flex size-12 items-center justify-center rounded-xl bg-brand-600 text-white">
+              <GraduationCap className="size-6" aria-hidden />
+            </span>
+          )}
+          <h1 className="mt-3 text-lg font-semibold text-slate-900">{name}</h1>
+          {code && (
+            <p className="mt-0.5 font-mono text-xs text-slate-400">
+              {window.location.host}/{code}
+            </p>
+          )}
+        </Link>
 
         <Suspense
           fallback={
@@ -28,9 +56,24 @@ export function AuthLayout() {
         </Suspense>
       </div>
 
-      <p className="mt-8 text-xs text-slate-400">
-        © {new Date().getFullYear()} {env.appName}
-      </p>
+      <div className="mt-8 flex flex-col items-center gap-2 text-xs text-slate-400">
+        <div className="flex items-center gap-4">
+          {/* The website is outside this school's app, so these are full page loads. */}
+          <a
+            href="/"
+            className="inline-flex items-center gap-1 rounded font-medium text-slate-500 hover:text-brand-700"
+          >
+            <ArrowLeft className="size-3.5" aria-hidden />
+            {env.appName} home
+          </a>
+          <a href="/login" className="rounded font-medium text-slate-500 hover:text-brand-700">
+            Not your school?
+          </a>
+        </div>
+        <p>
+          © {new Date().getFullYear()} {name}
+        </p>
+      </div>
     </div>
   );
 }

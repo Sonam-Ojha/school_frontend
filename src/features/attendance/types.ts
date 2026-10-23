@@ -139,6 +139,31 @@ export interface BiometricDevice {
   /** Entries pulled in on the last successful sync. */
   last_sync_count: number;
   error_message: string | null;
+  /**
+   * Numbers that scanned at this reader and belong to nobody on a roster —
+   * usually somebody enrolled on the device under a number that is not their
+   * admission number or employee ID.
+   */
+  unknown_ids?: string[];
+}
+
+/**
+ * A reader just registered, or just given a new key. The key is what the
+ * reader signs its scans with; the API returns it this once and never again.
+ */
+export interface RegisteredDevice extends BiometricDevice {
+  push_key?: string;
+}
+
+/** What checking in with a scanned code did. */
+export interface CheckInResult {
+  person_name: string;
+  status: AttendanceStatus;
+  /** When the scan was recorded; null for a mark somebody made by hand. */
+  checked_in_at: string | null;
+  /** True when the person had already been marked for the day. */
+  already_marked: boolean;
+  date: string;
 }
 
 /**

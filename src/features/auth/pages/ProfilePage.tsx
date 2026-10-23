@@ -1,6 +1,7 @@
 import { PATHS } from '@/app/router/paths';
 import { FullPageLoader } from '@/components/feedback/FullPageLoader';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Alert } from '@/components/ui/Alert';
 import { useAuthStore } from '@/store/authStore';
 
 import { ActiveSessionsCard } from '../components/ActiveSessionsCard';
@@ -27,6 +28,13 @@ export default function ProfilePage() {
       />
 
       <div className="max-w-3xl space-y-6">
+        {user.is_demo && (
+          <Alert tone="warning" title="This is a shared demo account">
+            Other visitors sign in to it too, so its name, photo and password cannot be changed.
+            Everything else here works as it would on an ordinary account.
+          </Alert>
+        )}
+
         <ProfileForm user={user} />
         <ChangePasswordForm />
         <ActiveSessionsCard />

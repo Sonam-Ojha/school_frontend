@@ -11360,6 +11360,35 @@ const ROUTES: Route[] = [
       return ok(config, { data: { user: currentUser, token: `mock-token-${match.user.id}` } });
     },
   ],
+  // Demo sign-in: the same accounts, entered from the sign-in page with one
+  // click and no password. A real server offers these only when told to.
+  [
+    'GET',
+    /^\/auth\/demo-accounts$/,
+    (_req, config) =>
+      ok(config, {
+        data: accounts.map(({ user }) => ({
+          email: user.email,
+          name: user.name,
+          role: user.roles[0],
+        })),
+      }),
+  ],
+  [
+    'POST',
+    /^\/auth\/demo-login$/,
+    (req, config) => {
+      const email = String(req.body.email ?? '').toLowerCase();
+      const match = accounts.find((entry) => entry.user.email === email);
+
+      if (!match) {
+        return unprocessable(config, { email: ['This demo account is not available.'] });
+      }
+
+      currentUser = { ...match.user };
+      return ok(config, { data: { user: currentUser, token: `mock-token-${match.user.id}` } });
+    },
+  ],
   ['POST', /^\/auth\/logout$/, (_req, config) => ((currentUser = null), ok(config, null, 204))],
   ['POST', /^\/auth\/logout-all$/, (_req, config) => ((currentUser = null), ok(config, null, 204))],
   [

@@ -14,6 +14,7 @@ import { cn } from '@/lib/cn';
 import { formatDateTime } from '@/lib/format';
 
 import { GpsDeviceModal } from '../components/GpsDeviceModal';
+import { GpsKeyDialog } from '../components/GpsKeyDialog';
 import { RouteProgress } from '../components/RouteProgress';
 import {
   GPS_STATUS_LABELS,
@@ -27,15 +28,16 @@ import {
   useRoute,
   useVehiclePositions,
 } from '../hooks/useTransport';
-import type { GpsDevice, VehiclePosition } from '../types';
+import type { GpsDevice, RegisteredGpsDevice, VehiclePosition } from '../types';
 
 /**
  * Live tracking.
  *
- * "GPS ready" in the same sense attendance is ready for biometrics: the
- * device registry, the position contract and this view all work, and no
- * vendor is bound. Trackers push to the backend over their own protocol; this
- * screen polls for what they pushed, every {@link TRACKING_POLL_MS}.
+ * A tracker — or a phone running a tracking app — reports its position to the
+ * server by itself, identified by the key it was given when it was registered
+ * here. This screen polls for what has arrived, every {@link TRACKING_POLL_MS}.
+ * A bus whose tracker has never reported is not listed: nothing is drawn that
+ * was not sent, unless the server is running with its demonstration switch on.
  */
 export default function TrackingPage() {
   const { data: positions, isLoading, dataUpdatedAt } = useVehiclePositions();
@@ -46,6 +48,7 @@ export default function TrackingPage() {
   const deleteDialog = useDisclosure();
   const [editing, setEditing] = useState<GpsDevice | null>(null);
   const [pendingDelete, setPendingDelete] = useState<GpsDevice | null>(null);
+  const [issued, setIssued] = useState<RegisteredGpsDevice | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
 
   const rows = positions ?? [];
@@ -196,8 +199,11 @@ export default function TrackingPage() {
             setEditing(null);
           }}
           device={editing}
+          onKeyIssued={setIssued}
         />
       )}
+
+      <GpsKeyDialog device={issued} onClose={() => setIssued(null)} />
 
       <ConfirmDialog
         isOpen={deleteDialog.isOpen}

@@ -6,7 +6,8 @@ export { PasswordRequirements } from './components/PasswordRequirements';
 export { ProfileForm } from './components/ProfileForm';
 
 export { useAuthSessions, useRevokeSession } from './hooks/useAuthSessions';
-export { useLogin } from './hooks/useLogin';
+export { useDemoAccounts } from './hooks/useDemoAccounts';
+export { useDemoLogin, useLogin } from './hooks/useLogin';
 export { useLogout } from './hooks/useLogout';
 export { useChangePassword, useForgotPassword, useResetPassword } from './hooks/usePasswordMutations';
 export { useUpdateAvatar, useUpdateProfile } from './hooks/useProfile';
@@ -28,4 +29,4 @@ export {
   type UpdateProfileInput,
 } from './schemas';
 
-export type { AuthSessionToken, LoginResponseData, MessageResponse } from './types';
+export type { AuthSessionToken, DemoAccount, LoginResponseData, MessageResponse } from './types';

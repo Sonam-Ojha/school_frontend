@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import { createResourceKeys } from '@/lib/queryKeys';
 import type { ListQueryParams } from '@/types/api';
+import type { Option } from '@/types/common';
 
 import { studentService } from '../services/studentService';
 
@@ -19,6 +21,30 @@ export function useStudents(params: ListQueryParams) {
     // the whole table back to skeletons.
     placeholderData: (previous) => previous,
   });
+}
+
+/**
+ * Active students as select options, labelled so that two children with the
+ * same name can be told apart. Reference data, so it is cached.
+ */
+export function useStudentOptions(enabled = true) {
+  const query = useQuery({
+    queryKey: studentKeys.options(),
+    queryFn: ({ signal }) => studentService.options(signal),
+    staleTime: 5 * 60_000,
+    enabled,
+  });
+
+  const studentOptions = useMemo<Option<number>[]>(
+    () =>
+      (query.data ?? []).map((student) => ({
+        label: `${student.full_name} — ${student.admission_no} · ${student.class_name}${student.section_name ? ` ${student.section_name}` : ''}`,
+        value: student.id,
+      })),
+    [query.data],
+  );
+
+  return { ...query, studentOptions };
 }
 
 export function useStudent(id: number | string | undefined) {

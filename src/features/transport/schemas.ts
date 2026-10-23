@@ -142,11 +142,14 @@ export const assignmentSchema = z.object({
 });
 
 export const gpsDeviceSchema = z.object({
+  // Not only a 15-digit IMEI: a phone running a tracking app reports an
+  // identifier of its own choosing, and the API accepts either.
   imei: z
     .string()
-    .min(15, 'An IMEI is 15 digits')
-    .max(17, 'An IMEI is 15 digits')
-    .regex(/^\d{15,17}$/, 'An IMEI is digits only'),
+    .trim()
+    .min(5, 'Enter the IMEI, or the ID the tracker reports')
+    .max(40, 'That is too long for an IMEI or a device ID')
+    .regex(/^[A-Za-z0-9_-]+$/, 'Letters, numbers and hyphens only'),
   sim_number: z.string().refine((value) => {
     if (value.trim() === '') return true;
     return /^[+]?[\d\s-]{7,20}$/.test(value.trim());
@@ -155,6 +158,8 @@ export const gpsDeviceSchema = z.object({
   /** Null is a device on the shelf, not yet fitted to anything. */
   vehicle_id: z.number().int().positive().nullable(),
   installed_on: z.string().min(1, 'An installation date is required'),
+  /** Edit only: replace the key the tracker reports with. */
+  regenerate_key: z.boolean(),
 });
 
 export type VehicleInput = z.infer<typeof vehicleSchema>;

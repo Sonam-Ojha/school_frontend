@@ -1,8 +1,15 @@
 import { http } from '@/lib/axios';
 import type { ApiResource, CollectionResponse } from '@/types/api';
 
-import type { QrSessionInput } from '../schemas';
-import type { BiometricDevice, QrSession } from '../types';
+import type { DeviceInput, QrSessionInput } from '../schemas';
+import type { BiometricDevice, CheckInResult, QrSession, RegisteredDevice } from '../types';
+
+const toDevicePayload = (input: DeviceInput) => ({
+  name: input.name.trim(),
+  serial_number: input.serial_number.trim().toUpperCase(),
+  location: input.location.trim() || null,
+  ...(input.regenerate_key ? { regenerate_key: true } : {}),
+});
 
 /**
  * Capture devices — the QR and biometric side of attendance.
@@ -20,6 +27,40 @@ export const deviceService = {
       signal,
     });
     return data.data;
+  },
+
+  /** Registers a reader. The reply carries its key, which is shown once. */
+  async createDevice(input: DeviceInput): Promise<RegisteredDevice> {
+    const { data } = await http.post<ApiResource<RegisteredDevice>>(
+      '/attendance/devices',
+      toDevicePayload(input),
+    );
+    return data.data;
+  },
+
+  async updateDevice(id: number, input: DeviceInput): Promise<RegisteredDevice> {
+    const { data } = await http.put<ApiResource<RegisteredDevice>>(
+      `/attendance/devices/${id}`,
+      toDevicePayload(input),
+    );
+    return data.data;
+  },
+
+  async removeDevice(id: number): Promise<void> {
+    await http.delete(`/attendance/devices/${id}`);
+  },
+
+  /**
+   * Checks the signed-in person in with the code they scanned. The server
+   * decides who that is from the session — nobody is named in the request,
+   * so nobody can be checked in by somebody else.
+   */
+  async checkIn(token: string): Promise<{ data: CheckInResult; message: string }> {
+    const { data } = await http.post<{ data: CheckInResult; message: string }>(
+      '/attendance/check-in',
+      { token },
+    );
+    return data;
   },
 
   /** Pulls any punches the device has buffered since the last sync. */
@@ -56,10 +97,14 @@ export const deviceService = {
   /**
    * The scannable image, rendered and signed by the backend.
    *
-   * Returned as a URL rather than fetched — an `<img src>` lets the browser
-   * cache and re-render it without this layer holding the bytes.
+   * Fetched rather than linked: the endpoint needs the sign-in token, which an
+   * `<img src>` pointing straight at the API cannot send.
    */
-  qrImageUrl(session: QrSession): string {
-    return `/attendance/qr-sessions/${session.id}/image`;
+  async qrImage(session: QrSession, signal?: AbortSignal): Promise<Blob> {
+    const { data } = await http.get<Blob>(`/attendance/qr-sessions/${session.id}/image`, {
+      responseType: 'blob',
+      signal,
+    });
+    return data;
   },
 };

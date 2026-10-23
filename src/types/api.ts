@@ -51,6 +51,13 @@ export interface ValidationErrorResponse {
 export interface ApiErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
+  /**
+   * Why, in a word the app can act on. Sent by the platform for refusals
+   * that are about the school's subscription rather than the request:
+   * `school_not_found`, `school_suspended`, `subscription_expired`,
+   * `module_unavailable`, `plan_limit`.
+   */
+  code?: string;
 }
 
 /** Query params every index endpoint accepts. */

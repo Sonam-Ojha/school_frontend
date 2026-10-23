@@ -83,6 +83,8 @@ export const PATHS = {
   attendanceReports: '/attendance/reports',
   attendanceHolidays: '/attendance/holidays',
   attendanceDevices: '/attendance/devices',
+  /** Where a scanned check-in code lands. Build with `toPath(PATHS.checkIn, { token })`. */
+  checkIn: '/check-in/:token',
 
   // Analytics — one route per domain. Beside reports, not inside it: one
   // says what happened, the other what it means.
@@ -176,6 +178,7 @@ export const PATHS = {
   /** Pattern — build with `toPath(PATHS.roleEdit, { id })`. */
   roleEdit: '/roles/:id/edit',
   permissions: '/permissions',
+  users: '/users',
 
   // School settings — tabs are real routes so each is linkable.
   settings: '/settings',

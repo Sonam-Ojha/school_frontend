@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { Form, FormGrid } from '@/components/form/Form';
+import { Form, FormFullRow, FormGrid } from '@/components/form/Form';
+import { FormCheckbox } from '@/components/form/FormCheckbox';
 import { FormInput } from '@/components/form/FormInput';
 import { FormSelect } from '@/components/form/FormSelect';
 import { Alert } from '@/components/ui/Alert';
@@ -12,7 +13,7 @@ import { todayInputValue } from '@/lib/format';
 
 import { useSaveGpsDevice, useVehicleOptions } from '../hooks/useTransport';
 import { gpsDeviceSchema, type GpsDeviceInput } from '../schemas';
-import type { GpsDevice } from '../types';
+import type { GpsDevice, RegisteredGpsDevice } from '../types';
 
 const FIELDS = ['imei', 'sim_number', 'provider', 'vehicle_id', 'installed_on'] as const;
 
@@ -21,9 +22,16 @@ interface GpsDeviceModalProps {
   onClose: () => void;
   /** Omit to register a new one. */
   device?: GpsDevice | null;
+  /** Called when the API issues a key, which it does once: on registering, or when a new one is asked for. */
+  onKeyIssued: (device: RegisteredGpsDevice) => void;
 }
 
-export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModalProps) {
+export function GpsDeviceModal({
+  isOpen,
+  onClose,
+  device = null,
+  onKeyIssued,
+}: GpsDeviceModalProps) {
   const isEdit = device !== null;
   const saveDevice = useSaveGpsDevice(device?.id);
 
@@ -38,6 +46,7 @@ export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModa
           provider: device.provider,
           vehicle_id: device.vehicle_id,
           installed_on: device.installed_on,
+          regenerate_key: false,
         }
       : {
           imei: '',
@@ -45,6 +54,7 @@ export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModa
           provider: '',
           vehicle_id: null,
           installed_on: todayInputValue(),
+          regenerate_key: false,
         },
   });
 
@@ -59,7 +69,7 @@ export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModa
       onClose={handleClose}
       size="md"
       title={isEdit ? 'Edit this tracker' : 'Register a tracker'}
-      description="The device itself. Positions arrive from it — nothing is configured here."
+      description="The device itself, and the bus it rides on. Positions are accepted only from trackers registered here."
       closeOnOverlayClick={!saveDevice.isPending}
       footer={
         <>
@@ -77,7 +87,10 @@ export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModa
         form={form}
         onSubmit={(values) =>
           saveDevice.mutate(values, {
-            onSuccess: handleClose,
+            onSuccess: (saved) => {
+              handleClose();
+              if (saved.push_key) onKeyIssued(saved);
+            },
             onError: (error) => {
               if (applyServerErrors(error, form.setError, FIELDS)) return;
               form.setError('root.serverError', { type: 'server', message: error.message });
@@ -88,10 +101,9 @@ export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModa
         <FormGrid cols={2}>
           <FormInput<GpsDeviceInput>
             name="imei"
-            inputMode="numeric"
-            label="IMEI"
+            label="IMEI or device ID"
             placeholder="860123456789012"
-            hint="Fifteen digits, printed on the device."
+            hint="The 15 digits printed on a fitted tracker, or any name for a phone — bus-07."
             required
           />
           <FormInput<GpsDeviceInput>
@@ -123,12 +135,24 @@ export function GpsDeviceModal({ isOpen, onClose, device = null }: GpsDeviceModa
             valueAsNumber
             hint="Leave blank for a spare device not yet fitted."
           />
+
+          {isEdit && (
+            <FormFullRow>
+              <FormCheckbox<GpsDeviceInput>
+                name="regenerate_key"
+                label="Issue a new key"
+                description="For a tracker that has been replaced or lost. The old key stops working at once."
+              />
+            </FormFullRow>
+          )}
         </FormGrid>
 
-        <Alert tone="info">
-          The tracker pushes to the backend over its own protocol. This screen only records which
-          device is on which bus, and reads back the positions that arrive.
-        </Alert>
+        {!isEdit && (
+          <Alert tone="info">
+            Registering gives you a key and the address to point the tracker at. They are shown
+            once, on the next screen.
+          </Alert>
+        )}
       </Form>
     </Modal>
   );

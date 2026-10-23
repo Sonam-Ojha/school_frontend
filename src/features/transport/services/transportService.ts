@@ -11,6 +11,7 @@ import type {
 import type { AssignmentInput, GpsDeviceInput, RouteInput, StopInput, VehicleInput } from '../schemas';
 import type {
   GpsDevice,
+  RegisteredGpsDevice,
   RouteDetail,
   TransportAssignment,
   TransportRoute,
@@ -248,18 +249,20 @@ export const transportService = {
     return data.data;
   },
 
-  async saveGpsDevice(input: GpsDeviceInput, id?: number): Promise<GpsDevice> {
+  async saveGpsDevice(input: GpsDeviceInput, id?: number): Promise<RegisteredGpsDevice> {
     const payload = {
       imei: input.imei.trim(),
       sim_number: nullable(input.sim_number),
       provider: input.provider.trim(),
       vehicle_id: input.vehicle_id,
       installed_on: input.installed_on,
+      // Only an edit can ask for a new key; a new tracker is always given one.
+      ...(id && input.regenerate_key ? { regenerate_key: true } : {}),
     };
 
     const { data } = id
-      ? await http.put<ApiResource<GpsDevice>>(`/transport/gps/devices/${id}`, payload)
-      : await http.post<ApiResource<GpsDevice>>('/transport/gps/devices', payload);
+      ? await http.put<ApiResource<RegisteredGpsDevice>>(`/transport/gps/devices/${id}`, payload)
+      : await http.post<ApiResource<RegisteredGpsDevice>>('/transport/gps/devices', payload);
 
     return data.data;
   },

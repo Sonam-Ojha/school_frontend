@@ -100,6 +100,12 @@ export const studentService = {
   list: base.list,
   remove: base.remove,
 
+  /**
+   * Active students, unpaginated, for another module's picker — linking a
+   * parent's account to their children, say. The roll has one owner.
+   */
+  options: (signal?: AbortSignal) => base.all({ status: 'active' }, signal),
+
   async show(id: number | string, signal?: AbortSignal): Promise<StudentDetail> {
     const { data } = await http.get<ApiResource<StudentDetail>>(`/students/${id}`, { signal });
     return data.data;

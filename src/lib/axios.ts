@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
+import { schoolCode } from '@/app/tenant';
 import { env } from '@/config/env';
 import { authStore } from '@/store/authStore';
 
@@ -24,6 +25,10 @@ export const http: AxiosInstance = axios.create({
 });
 
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  // Which school this request is for. The platform routes it to that
+  // school's own server; a single-school server ignores it.
+  if (schoolCode) config.headers.set('X-School', schoolCode);
+
   if (env.authMode === 'token') {
     const token = authStore.getToken();
     if (token) {
@@ -54,8 +59,8 @@ http.interceptors.response.use(
   (error: unknown) => {
     const apiError = toApiError(error);
 
-    // A 401 on the session-probe endpoint is the expected "not logged in"
-    // answer, not an expiry — the auth module handles that case itself.
+    // A 401 on a probe endpoint is the expected "not logged in" answer, not
+    // an expiry — the auth module handles that case itself.
     if (apiError.isUnauthorized && !isSessionProbe(error)) {
       authStore.clear();
       onUnauthorized?.();
@@ -65,9 +70,15 @@ http.interceptors.response.use(
   },
 );
 
+/**
+ * Requests whose 401 says nothing about the session: the boot-time check of
+ * who is signed in, and the public list of demo accounts — which a server
+ * that predates it guards like any other route.
+ */
 function isSessionProbe(error: unknown): boolean {
   if (!axios.isAxiosError(error)) return false;
-  return Boolean(error.config?.url?.includes('/auth/me'));
+  const url = error.config?.url ?? '';
+  return url.includes('/auth/me') || url.includes('/auth/demo-accounts');
 }
 
 /** Fetch the Sanctum CSRF cookie. No-op outside cookie mode. */
