@@ -19,7 +19,7 @@ import { useEntry } from '@/features/landing/hooks/useEntry';
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, 'Enter your name.').max(120),
-  school_name: z.string().trim().min(2, 'Enter your school's name.').max(150),
+  school_name: z.string().trim().min(2, "Enter your school's name.").max(150),
   email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
   phone: z.string().trim().regex(/^[0-9+\-\s()]{7,20}$/, 'Enter a valid phone number.'),
   city: z.string().trim().max(80),
@@ -55,9 +55,9 @@ const CONTACT_INFO = [
 ];
 
 const BENEFITS = [
-  'We walk through the system with your school's own data',
+  'We walk through the system with your school\'s own data',
   'You choose which modules matter most: fees, exams, payroll…',
-  'No sales pressure — it works or it doesn't',
+  'No sales pressure — it works or it doesn\'t',
   'We answer every question on the call',
 ];
 

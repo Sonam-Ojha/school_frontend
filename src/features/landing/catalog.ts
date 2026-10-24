@@ -123,7 +123,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
           'Admission form in steps: student, parents and guardians, medical details, previous school',
           'A profile with every detail in tabs, and documents uploaded against it',
           'Printable student ID cards',
-          'Search by name, admission number or a parent’s phone; filter by class, section and status',
+          'Search by name, admission number or a parent's phone; filter by class, section and status',
           'Export any list to Excel, PDF or CSV',
         ],
       },
@@ -178,7 +178,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
           'Leave types — casual, sick, earned and your own — with yearly entitlements',
           'Leave for students, teachers and staff in one place',
           'Approval by the principal or vice principal; balances count leave still pending',
-          'Parents apply for their child’s leave from their own login',
+          'Parents apply for their child's leave from their own login',
           'Usage reports by person and by type',
         ],
       },
@@ -197,8 +197,8 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         summary: 'Build the week once; read it three ways.',
         points: [
           'The periods of the school day, and a register of rooms and labs',
-          'Each section’s week, each teacher’s week and each room’s bookings',
-          'Clash detection for teachers and rooms, and limits on a teacher’s daily load',
+          'Each section's week, each teacher's week and each room's bookings',
+          'Clash detection for teachers and rooms, and limits on a teacher's daily load',
           'Print a timetable for any class, teacher or room',
         ],
       },
@@ -277,8 +277,8 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         icon: Wallet,
         summary: 'A parent comes to the window; the receipt is in their hand a minute later.',
         points: [
-          'Find the student by name, admission number, father’s name or phone — straight from the keyboard',
-          'Tick what is being paid: this quarter’s fee, or only the books charge',
+          'Find the student by name, admission number, father's name or phone — straight from the keyboard',
+          'Tick what is being paid: this quarter's fee, or only the books charge',
           'One-off charges at the desk: books, uniform, ID card, TC fee',
           'Cash, cheque or DD, UPI, card and bank transfer — with cheque number, bank and date',
           'Part payments, concessions and extra fines at the counter; change worked out for cash',
@@ -289,9 +289,9 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         icon: Receipt,
         summary: 'Proper receipts, printed on the spot.',
         points: [
-          'The school’s letterhead, the student with father’s name and roll number',
+          'The school's letterhead, the student with father's name and roll number',
           'What was paid towards, the amount in words (lakh and crore) and the balance still due',
-          'Two copies on one A4 sheet — the parent’s and the school’s',
+          'Two copies on one A4 sheet — the parent's and the school's',
           'PDF, reprint at any time, or send it to the parent on WhatsApp',
           'A receipt is cancelled only with a reason, and stays on record',
         ],
@@ -302,7 +302,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         summary: 'Close the counter at the end of the day, and know it tallies.',
         points: [
           'Every receipt of the day, by payment mode and by cashier',
-          'The day’s expenses, and the cash that should be in the drawer',
+          'The day's expenses, and the cash that should be in the drawer',
           'Count the notes (₹500 to ₹10) and coins; the difference is recorded',
           'Printed with signature lines for the handover; Excel and PDF export',
         ],
@@ -362,7 +362,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
   },
   {
     id: 'campus',
-    title: 'Library, transport & hostel',
+    title: 'Library & transport',
     short: 'Campus',
     lead: 'The parts of the school that run on registers — now on the same records as everything else.',
     icon: Bus,
@@ -390,17 +390,17 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
           'Live bus location with GPS devices',
         ],
       },
-      {
-        name: 'Hostel',
-        icon: BedDouble,
-        summary: 'Rooms, beds and the nightly roll call.',
-        points: [
-          'Hostels, rooms and beds',
-          'Bed allocation with gender and capacity rules; transfers and vacating',
-          'Monthly rent and mess charged to the student’s fee account',
-          'The evening roll call',
-        ],
-      },
+      // {
+      //   name: 'Hostel',
+      //   icon: BedDouble,
+      //   summary: 'Rooms, beds and the nightly roll call.',
+      //   points: [
+      //     'Hostels, rooms and beds',
+      //     'Bed allocation with gender and capacity rules; transfers and vacating',
+      //     'Monthly rent and mess charged to the student fee account',
+      //     'The evening roll call',
+      //   ],
+      // },
     ],
   },
   {
@@ -425,8 +425,8 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         icon: MessageSquare,
         summary: 'One message, every channel.',
         points: [
-          'Email, SMS, WhatsApp and push from one place (SMS and WhatsApp through your provider’s account)',
-          'Templates with placeholders such as the student’s name and the amount due',
+          'Email, SMS, WhatsApp and push from one place (SMS and WhatsApp through your provider's account)',
+          'Templates with placeholders such as the student's name and the amount due',
           'SMS length and cost shown before sending',
           'A delivery record for every family',
         ],
@@ -453,7 +453,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         name: 'Parent & student portal',
         icon: Smartphone,
-        summary: 'Their own child, nobody else’s.',
+        summary: 'Their own child, nobody else's.',
         points: [
           'Attendance, homework and assignments, timetable and exam schedule',
           'Results and report cards as soon as they are published',
@@ -467,7 +467,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         icon: Presentation,
         summary: 'The working day of a teacher.',
         points: [
-          'Today’s timetable at a glance',
+          'Today's timetable at a glance',
           'Mark attendance, set homework and assignments, enter marks',
           'Notices, and their own leave applications',
         ],
@@ -544,11 +544,11 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         icon: Lock,
         summary: 'Your data is yours, and kept apart.',
         points: [
-          'Every school’s data in its own database tables',
-          'Every request checked against the person’s permissions on the server',
+          'Every school's data in its own database tables',
+          'Every request checked against the person's permissions on the server',
           'Passwords and sign-in tokens stored encrypted; lock-out after repeated wrong passwords',
           'See every signed-in device and sign any of them out',
-          'Parents and students see only their own children’s records',
+          'Parents and students see only their own children's records',
           'Activity logs and database backups',
         ],
       },
@@ -558,7 +558,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     id: 'platform',
     title: 'For school groups & partners',
     short: 'Multi-school',
-    lead: 'Run many schools — a trust’s branches, or your own white-label platform — from one console.',
+    lead: 'Run many schools — a trust's branches, or your own white-label platform — from one console.',
     icon: Building2,
     modules: [
       {
@@ -568,7 +568,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         points: [
           'Open a new school in minutes, each at its own address, sub-domain or custom domain',
           'Plans with the modules and limits you choose; free trials',
-          'Suspend, reactivate, or step in as a school’s administrator to help',
+          'Suspend, reactivate, or step in as a school's administrator to help',
           'Platform team roles: Super Admin, Support, Billing and Sales',
         ],
       },
@@ -588,7 +588,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         icon: Palette,
         summary: 'Your brand on every screen.',
         points: [
-          'Your name, logo and colours on the website, the console and every school’s sign-in page',
+          'Your name, logo and colours on the website, the console and every school's sign-in page',
           'A support desk with tickets from every school',
           'Website enquiries collected for your sales team',
         ],

@@ -1,3 +1,5 @@
+import { ArrowRight } from 'lucide-react';
+
 import { cn } from '@/lib/cn';
 
 import { MODULES } from '../content';
@@ -45,6 +47,17 @@ export function ModulesSection() {
           </li>
         ))}
       </ul>
+
+      {/* CTA to full features page */}
+      <div className="mt-8 flex justify-center">
+        <a
+          href="/features"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow-md"
+        >
+          See every feature in detail
+          <ArrowRight className="size-4" aria-hidden />
+        </a>
+      </div>
     </Section>
   );
 }

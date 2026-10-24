@@ -1,5 +1,5 @@
-import { GraduationCap, LogIn, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { GraduationCap, Menu, PlayCircle, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { env } from '@/config/env';
@@ -12,14 +12,28 @@ import { CONTAINER } from './Section';
 
 /** Sticky top bar — dark, with blur backdrop, hamburger on mobile. */
 export function LandingNav() {
-  const { label, enter, startTrial } = useEntry();
+  const { startTrial } = useEntry();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur-lg">
+    <header
+      className={cn(
+        'sticky top-0 z-40 border-b transition-all duration-200',
+        scrolled
+          ? 'border-white/10 bg-slate-950/90 backdrop-blur-lg shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
+          : 'border-white/5 bg-slate-950/80 backdrop-blur-md',
+      )}
+    >
       <div className={cn(CONTAINER, 'flex h-16 items-center gap-3')}>
         {/* Logo */}
-        <a href="#top" className="flex items-center gap-2.5 rounded-lg">
+        <a href="/" className="flex items-center gap-2.5 rounded-lg">
           <span className="flex size-9 items-center justify-center rounded-lg bg-brand-600 text-white shadow-[0_0_16px_rgba(99,102,241,0.5)]">
             <GraduationCap className="size-5" aria-hidden />
           </span>
@@ -27,7 +41,7 @@ export function LandingNav() {
         </a>
 
         {/* Desktop nav */}
-        <nav aria-label="On this page" className="ml-auto hidden items-center gap-1 lg:flex">
+        <nav aria-label="Site navigation" className="ml-auto hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => (
             <a
               key={link.id}
@@ -41,14 +55,13 @@ export function LandingNav() {
 
         {/* Desktop CTAs */}
         <div className="ml-auto flex items-center gap-2 lg:ml-2">
-          <Button
-            variant="ghost"
-            onClick={enter}
-            leftIcon={<LogIn className="size-4" aria-hidden />}
-            className="hidden text-slate-300 hover:text-white sm:inline-flex"
+          <a
+            href="/sunrise/login"
+            className="hidden items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:inline-flex"
           >
-            {label}
-          </Button>
+            <PlayCircle className="size-4 text-brand-400" aria-hidden />
+            Live Demo
+          </a>
           <Button
             onClick={startTrial}
             className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_16px_rgba(99,102,241,0.3)]"
@@ -82,13 +95,21 @@ export function LandingNav() {
               </a>
             ))}
             <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
-              <button
-                onClick={() => { enter(); setMobileOpen(false); }}
+              <a
+                href="/sunrise/login"
+                onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10"
               >
-                <LogIn className="size-4" />
-                {label}
-              </button>
+                <PlayCircle className="size-4 text-brand-400" />
+                Live Demo
+              </a>
+              <Button
+                fullWidth
+                onClick={() => { startTrial(); setMobileOpen(false); }}
+                className="bg-brand-600 hover:bg-brand-500"
+              >
+                Start free trial
+              </Button>
             </div>
           </nav>
         </div>

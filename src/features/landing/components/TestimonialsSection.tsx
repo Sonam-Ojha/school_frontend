@@ -36,6 +36,15 @@ const TESTIMONIALS = [
   },
 ];
 
+const TRUST_LOGOS = [
+  'Delhi Public School',
+  "St. Xavier's School",
+  'Kendriya Vidyalaya',
+  'Spring Fields Academy',
+  'Little Flowers Convent',
+  'Saraswati Vidya Mandir',
+];
+
 export function TestimonialsSection() {
   return (
     <section
@@ -44,7 +53,8 @@ export function TestimonialsSection() {
       className="scroll-mt-16 bg-slate-50 py-20 sm:py-24"
     >
       <div className={CONTAINER}>
-        <div className="max-w-2xl">
+        {/* Header */}
+        <div className="flex flex-col items-center text-center">
           <p className="text-sm font-semibold text-brand-600">What schools say</p>
           <h2
             id="testimonials-title"
@@ -52,21 +62,30 @@ export function TestimonialsSection() {
           >
             Trusted by school teams across India
           </h2>
-          <p className="mt-3 text-base text-slate-600">
+          <p className="mt-3 max-w-xl text-base text-slate-600">
             From the principal to the accountant to the front office — everyone has their own place
             in the system.
           </p>
         </div>
 
+        {/* Testimonial cards */}
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((t) => (
             <figure
               key={t.name}
-              className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-slate-200/60"
             >
+              {/* Top gradient accent */}
+              <div
+                className={cn(
+                  'absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100',
+                  t.gradient,
+                )}
+              />
+
               {/* Decorative quote */}
               <Quote
-                className="absolute right-5 top-5 size-8 text-slate-100 transition-colors duration-200 group-hover:text-slate-200"
+                className="absolute right-5 top-5 size-10 text-slate-100 transition-colors duration-200 group-hover:text-slate-200"
                 aria-hidden
               />
 
@@ -81,10 +100,10 @@ export function TestimonialsSection() {
                 "{t.quote}"
               </blockquote>
 
-              <figcaption className="mt-6 flex items-center gap-3">
+              <figcaption className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
                 <span
                   className={cn(
-                    'flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold text-white',
+                    'flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold text-white shadow-sm',
                     t.gradient,
                   )}
                 >
@@ -99,6 +118,20 @@ export function TestimonialsSection() {
               </figcaption>
             </figure>
           ))}
+        </div>
+
+        {/* Trust bar */}
+        <div className="mt-14 border-t border-slate-200 pt-10">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-400">
+            Schools using this system
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            {TRUST_LOGOS.map((name) => (
+              <span key={name} className="text-sm font-medium text-slate-400 transition-colors hover:text-slate-600">
+                {name}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>

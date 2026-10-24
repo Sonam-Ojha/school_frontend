@@ -53,11 +53,10 @@ import { ROLES } from '@/types/auth';
  */
 
 export const NAV_LINKS = [
-  { id: 'modules', label: 'Features', href: '/features' },
+  { id: 'features', label: 'Features', href: '/features' },
   { id: 'roles', label: 'Who it\'s for', href: '/#roles' },
   { id: 'pricing', label: 'Pricing', href: '/pricing' },
-  { id: 'highlights', label: 'Why us', href: '/#highlights' },
-  { id: 'contact', label: 'Book a demo', href: '/contact' },
+  { id: 'about', label: 'About', href: '/about' },
 ] as const;
 
 export interface Stat {
@@ -169,11 +168,11 @@ export const MODULES: ModuleSummary[] = [
     summary: 'Vehicles, routes with their stops, drivers and the students assigned to each route.',
     icon: Bus,
   },
-  {
-    name: 'Hostel',
-    summary: 'Blocks and rooms, allocations and transfers, hostel charges and the nightly roll call.',
-    icon: BedDouble,
-  },
+  // {
+  //   name: 'Hostel',
+  //   summary: 'Blocks and rooms, allocations and transfers, hostel charges and the nightly roll call.',
+  //   icon: BedDouble,
+  // },
   {
     name: 'Messages & notices',
     summary:
@@ -250,7 +249,7 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
   },
   {
     role: ROLES.classTeacher,
-    summary: 'Their own class: the register, students’ details, homework, report cards and parents.',
+    summary: 'Their own class: the register, students' details, homework, report cards and parents.',
     icon: Users,
   },
   {
@@ -270,7 +269,7 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
   },
   {
     role: ROLES.receptionist,
-    summary: 'Admissions and the front desk: new students, ID cards, notices and parents’ calls.',
+    summary: 'Admissions and the front desk: new students, ID cards, notices and parents' calls.',
     icon: ConciergeBell,
   },
   {
@@ -283,11 +282,11 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
     summary: 'The fleet: vehicles, routes and stops, drivers, and which student rides where.',
     icon: Bus,
   },
-  {
-    role: ROLES.hostelWarden,
-    summary: 'Boarding: rooms and beds, allocations, the nightly roll call and boarders’ leave.',
-    icon: BedDouble,
-  },
+  // {
+  //   role: ROLES.hostelWarden,
+  //   summary: "Boarding: rooms and beds, allocations, the nightly roll call and boarders leave.",
+  //   icon: BedDouble,
+  // },
   {
     role: ROLES.staff,
     summary: 'Reads notices and applies for their own leave.',
@@ -319,7 +318,7 @@ export const HIGHLIGHTS: Highlight[] = [
   },
   {
     title: 'The right screen for each person',
-    body: 'Sixteen ready-made roles, plus your own. A class teacher sees their own class; parents and students see only their own child’s attendance, fees and results.',
+    body: 'Sixteen ready-made roles, plus your own. A class teacher sees their own class; parents and students see only their own child's attendance, fees and results.',
     icon: Users,
   },
   {
@@ -329,7 +328,7 @@ export const HIGHLIGHTS: Highlight[] = [
   },
   {
     title: 'Fast on any connection',
-    body: 'Pages answer in milliseconds, on a school office computer or a parent’s phone on mobile data.',
+    body: 'Pages answer in milliseconds, on a school office computer or a parent's phone on mobile data.',
     icon: Zap,
   },
   {
@@ -359,7 +358,7 @@ export const FLOW: FlowStep[] = [
   },
   {
     title: 'Node.js API',
-    body: 'Express checks the sign-in token, then the permission, then applies the school’s rules to data held in memory.',
+    body: 'Express checks the sign-in token, then the permission, then applies the school's rules to data held in memory.',
     icon: Server,
   },
   {

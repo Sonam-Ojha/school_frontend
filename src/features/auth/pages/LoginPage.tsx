@@ -10,7 +10,9 @@ import { LoginForm } from '../components/LoginForm';
 import { useDemoAccounts } from '../hooks/useDemoAccounts';
 
 export default function LoginPage() {
-  const { data: demoAccounts = [] } = useDemoAccounts();
+  const { data: rawDemoAccounts = [] } = useDemoAccounts();
+  // Hostel management is not yet active — hide the warden demo account.
+  const demoAccounts = rawDemoAccounts.filter((a) => a.role !== 'hostel-warden');
   const { setWide } = useAuthLayoutContext();
 
   // Expand the AuthLayout container when demo accounts are available.

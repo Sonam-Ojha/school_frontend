@@ -14,6 +14,7 @@ import { LandingNav } from '../components/LandingNav';
 import { ModulesSection } from '../components/ModulesSection';
 import { PricingSection } from '../components/PricingSection';
 import { RolesSection } from '../components/RolesSection';
+import { StackSection } from '../components/StackSection';
 import { TestimonialsSection } from '../components/TestimonialsSection';
 
 // Named in full so Tailwind generates it; applied to <html> only while this
@@ -61,6 +62,7 @@ export default function LandingPage() {
         <ModulesSection />
         <RolesSection />
         <HowItWorksSection />
+        <StackSection />
         <TestimonialsSection />
         <PricingSection trialDays={trialDays} />
         <HighlightsSection />
