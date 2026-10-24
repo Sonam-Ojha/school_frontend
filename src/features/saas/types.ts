@@ -34,7 +34,10 @@ export interface PublicPlan {
   tagline: string;
   price_monthly: number;
   price_yearly: number;
+  /** Null is unlimited. */
   max_students: number | null;
+  max_users?: number | null;
+  max_storage_mb?: number | null;
   modules: ModuleKey[];
   features: string[];
   is_featured: boolean;
@@ -42,6 +45,8 @@ export interface PublicPlan {
 
 export interface SaasConfig {
   brand_name: string;
+  brand_logo_url?: string | null;
+  brand_color?: string;
   support_email: string;
   support_phone: string;
   currency: string;
@@ -61,11 +66,27 @@ export interface SchoolInfo {
   access: Access;
   state: SubscriptionState;
   demo_login: boolean;
+  /** The optional modules on the school's plan. */
+  modules?: ModuleKey[];
+}
+
+export interface PlanLimits {
+  max_students: number | null;
+  max_users: number | null;
+  max_storage_mb: number | null;
+}
+
+export interface SchoolUsage {
+  students: number;
+  teachers: number;
+  staff: number;
+  users: number;
+  storage_bytes: number;
 }
 
 export interface Subscription {
   school: { id: number; code: string; name: string; city: string };
-  plan: PublicPlan;
+  plan: PublicPlan | null;
   billing_cycle: BillingCycle;
   state: SubscriptionState;
   access: Access;
@@ -75,13 +96,16 @@ export interface Subscription {
   current_period_end: string | null;
   grace_days: number;
   modules: ModuleKey[];
-  limits: { max_students: number | null };
-  usage: {
-    students: number;
-    teachers: number;
-    staff: number;
-    users: number;
-    storage_bytes: number;
+  limits: PlanLimits;
+  usage: SchoolUsage | null;
+  /** The oldest unpaid invoice, for the banner and the pay button. */
+  open_invoice: {
+    id: number;
+    number: string;
+    total: number;
+    balance_due: number;
+    due_date: string;
+    overdue: boolean;
   } | null;
   /** Only for the school's administrators. */
   invoices: SchoolInvoice[] | null;
@@ -91,6 +115,15 @@ export interface Subscription {
     key_id: string | null;
     instructions: string;
   };
+  support: { email: string; phone: string };
+}
+
+export interface InvoiceLine {
+  description: string;
+  sac: string;
+  quantity: number;
+  rate: number;
+  amount: number;
 }
 
 export interface SchoolInvoice {
@@ -100,15 +133,61 @@ export interface SchoolInvoice {
   billing_cycle: BillingCycle;
   period_start: string;
   period_end: string;
+  lines: InvoiceLine[];
   amount: number;
+  discount: number;
+  taxable: number;
   tax_percent: number;
+  cgst: number;
+  sgst: number;
+  igst: number;
   tax: number;
   total: number;
   currency: string;
+  place_of_supply: string;
   status: 'open' | 'paid' | 'void';
   due_date: string;
   issued_at: string;
   paid_at: string | null;
+  notes: string;
+  amount_paid: number;
+  balance_due: number;
+  overdue: boolean;
+}
+
+export type TicketCategory = 'technical' | 'billing' | 'account' | 'feature' | 'other';
+export type TicketPriority = 'low' | 'normal' | 'high' | 'urgent';
+export type TicketStatus = 'open' | 'in_progress' | 'waiting' | 'resolved' | 'closed';
+
+export interface TicketMessage {
+  id: number;
+  from: 'school' | 'platform';
+  author_name: string;
+  author_email: string;
+  body: string;
+  at: string;
+}
+
+export interface SupportTicket {
+  id: number;
+  number: string;
+  subject: string;
+  category: TicketCategory;
+  priority: TicketPriority;
+  status: TicketStatus;
+  raised_by: { name: string; email: string; user_id: number };
+  messages: TicketMessage[];
+  last_message_at: string;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
+}
+
+export interface NewTicketInput {
+  subject: string;
+  category: TicketCategory;
+  priority: TicketPriority;
+  message: string;
 }
 
 export interface SignupInput {

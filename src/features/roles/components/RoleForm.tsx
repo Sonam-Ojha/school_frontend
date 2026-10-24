@@ -15,9 +15,10 @@ import { applyServerErrors } from '@/lib/formErrors';
 import { usePermissions } from '../hooks/usePermissions';
 import { roleSchema, type RoleInput } from '../schemas';
 
+import { HiddenFieldsPicker } from './HiddenFieldsPicker';
 import { PermissionMatrix } from './PermissionMatrix';
 
-const FIELDS = ['name', 'permissions'] as const;
+const FIELDS = ['name', 'permissions', 'hidden_fields'] as const;
 
 interface RoleFormProps {
   defaultValues: RoleInput;
@@ -53,6 +54,10 @@ export function RoleForm({
   // rather than `register`.
   const { field: permissionsField } = useController({
     name: 'permissions',
+    control: form.control,
+  });
+  const { field: hiddenField } = useController({
+    name: 'hidden_fields',
     control: form.control,
   });
 
@@ -113,6 +118,10 @@ export function RoleForm({
                 disabled={isPending}
               />
             )}
+          </FormField>
+
+          <FormField htmlFor="hidden_fields" label="Hide sensitive details from this role">
+            <HiddenFieldsPicker value={hiddenField.value ?? []} onChange={hiddenField.onChange} disabled={isPending} />
           </FormField>
         </CardBody>
 

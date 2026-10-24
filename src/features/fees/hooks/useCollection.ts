@@ -5,12 +5,13 @@ import { formatCurrency } from '@/lib/format';
 import { toast } from '@/store/toastStore';
 import type { ListQueryParams } from '@/types/api';
 
-import type { CancelPaymentInput, CollectPaymentInput } from '../schemas';
+import type { AddChargeInput, CancelPaymentInput, CollectPaymentInput } from '../schemas';
 import { collectionService } from '../services/collectionService';
 
 export const paymentKeys = createResourceKeys('fee-payments');
 export const accountKeys = createResourceKeys('fee-account');
 export const dueKeys = createResourceKeys('fee-dues');
+export const dayBookKeys = createResourceKeys('fee-day-book');
 
 /**
  * A student's fee account.
@@ -37,6 +38,7 @@ function useInvalidateCollection() {
       queryClient.invalidateQueries({ queryKey: accountKeys.all }),
       queryClient.invalidateQueries({ queryKey: paymentKeys.all }),
       queryClient.invalidateQueries({ queryKey: dueKeys.all }),
+      queryClient.invalidateQueries({ queryKey: dayBookKeys.all }),
     ]);
   };
 }
@@ -53,6 +55,66 @@ export function useCollectPayment() {
         `${formatCurrency(payment.amount)} collected from ${payment.student_name}.`,
       );
     },
+  });
+}
+
+export function useAddCharge(studentId: number) {
+  const invalidate = useInvalidateCollection();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: AddChargeInput) => collectionService.addCharge(studentId, input),
+    onSuccess: async ({ account, message }) => {
+      queryClient.setQueryData(accountKeys.detail(studentId), account);
+      await invalidate();
+      toast.success('Charge added', message);
+    },
+  });
+}
+
+export function useRemoveCharge(studentId: number) {
+  const invalidate = useInvalidateCollection();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dueId: number) => collectionService.removeCharge(studentId, dueId),
+    onSuccess: async ({ account, message }) => {
+      queryClient.setQueryData(accountKeys.detail(studentId), account);
+      await invalidate();
+      toast.success('Charge removed', message);
+    },
+  });
+}
+
+/** The day book; refreshed after every payment, charge or closing. */
+export function useDayBook(date: string, collector: string | null) {
+  return useQuery({
+    queryKey: dayBookKeys.list({ date, collector: collector ?? '' }),
+    queryFn: ({ signal }) => collectionService.dayBook(date, collector, signal),
+    placeholderData: (previous) => previous,
+  });
+}
+
+export function useCloseDay() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: collectionService.closeDay,
+    onSuccess: async ({ message }) => {
+      await queryClient.invalidateQueries({ queryKey: dayBookKeys.all });
+      toast.success('Day closed', message);
+    },
+  });
+}
+
+export function useExportDayBook() {
+  return useMutation({
+    mutationFn: ({ date, collector, format }: { date: string; collector: string | null; format: 'pdf' | 'excel' }) =>
+      collectionService.exportDayBook(date, collector, format),
+    onSuccess: (_result, { format }) =>
+      toast.success(`${format === 'excel' ? 'Excel' : 'PDF'} day book ready`, 'Check your downloads.'),
+    onError: (error) => toast.error('Export failed', error.message),
+    meta: { skipGlobalError: true },
   });
 }
 

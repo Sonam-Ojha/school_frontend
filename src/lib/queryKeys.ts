@@ -25,6 +25,8 @@ export const queryKeys = {
     school: (code: string) => [...queryKeys.saas.all, 'school', code] as const,
     subscription: () => [...queryKeys.saas.all, 'subscription'] as const,
     invoice: (id: number) => [...queryKeys.saas.all, 'invoice', id] as const,
+    tickets: () => [...queryKeys.saas.all, 'tickets'] as const,
+    ticket: (id: number) => [...queryKeys.saas.all, 'tickets', id] as const,
   },
 } as const;
 

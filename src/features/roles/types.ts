@@ -19,6 +19,8 @@ export interface Role {
 /** `GET /roles/{id}` — adds the assigned permission names. */
 export interface RoleDetail extends Role {
   permissions: string[];
+  /** Groups of sensitive details the server blanks out for this role. */
+  hidden_fields?: string[];
 }
 
 export interface Permission {
@@ -35,6 +37,7 @@ export interface Permission {
 export interface RolePayload {
   name: string;
   permissions: string[];
+  hidden_fields: string[];
 }
 
 /** One permission, split into its addressable parts for the matrix UI. */

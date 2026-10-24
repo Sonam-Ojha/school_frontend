@@ -10,13 +10,17 @@ import {
   ChartColumnBig,
   ChartScatter,
   ClipboardList,
+  CreditCard,
   FileSpreadsheet,
   GraduationCap,
+  HandCoins,
   HardHat,
+  History,
   KeyRound,
   LayoutDashboard,
   LayoutGrid,
   Library,
+  LifeBuoy,
   MessageSquare,
   Settings,
   ShieldCheck,
@@ -31,6 +35,7 @@ import { ASSIGNMENT_PERMISSIONS } from '@/features/assignments/constants';
 import { ATTENDANCE_PERMISSIONS } from '@/features/attendance/constants';
 import { COMMUNICATION_PERMISSIONS } from '@/features/communication/constants';
 import { EXAM_PERMISSIONS } from '@/features/exams/constants';
+import { EXPENSE_PERMISSIONS } from '@/features/expenses/constants';
 import { FEE_PERMISSIONS } from '@/features/fees/constants';
 import { HOMEWORK_PERMISSIONS } from '@/features/homework/constants';
 import { HOSTEL_PERMISSIONS } from '@/features/hostel/constants';
@@ -105,6 +110,12 @@ export const NAVIGATION: NavSection[] = [
         to: PATHS.fees,
         icon: Wallet,
         permissions: [FEE_PERMISSIONS.read],
+      },
+      {
+        label: 'Expenses',
+        to: PATHS.expenses,
+        icon: HandCoins,
+        permissions: [EXPENSE_PERMISSIONS.read],
       },
       {
         label: 'Payroll',
@@ -238,6 +249,12 @@ export const NAVIGATION: NavSection[] = [
         icon: KeyRound,
         permissions: [PERMISSION_PERMISSIONS.read],
       },
+      {
+        label: 'Access log',
+        to: PATHS.accessLog,
+        icon: History,
+        permissions: [ROLE_PERMISSIONS.read, USER_PERMISSIONS.read],
+      },
     ],
   },
   {
@@ -248,6 +265,19 @@ export const NAVIGATION: NavSection[] = [
         to: PATHS.settings,
         icon: Settings,
         permissions: [SETTINGS_PERMISSIONS.read],
+      },
+      // The school's account with the platform: the School Admin's, as the API has it.
+      {
+        label: 'Subscription & billing',
+        to: PATHS.subscription,
+        icon: CreditCard,
+        permissions: [SETTINGS_PERMISSIONS.update],
+      },
+      {
+        label: 'Help & support',
+        to: PATHS.support,
+        icon: LifeBuoy,
+        permissions: [SETTINGS_PERMISSIONS.update],
       },
     ],
   },

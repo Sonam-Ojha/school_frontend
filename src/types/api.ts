@@ -47,17 +47,29 @@ export interface ValidationErrorResponse {
   errors: Record<string, string[]>;
 }
 
-/** Generic Laravel error body (`AppExceptionHandler`). */
+/**
+ * Every answer from the API has the same envelope:
+ * `{ success, code, message, data }`. For a refusal, `code` is the HTTP
+ * status and `data` carries the details — `errors` per form field, and
+ * `reason`, a word the app can act on.
+ */
 export interface ApiErrorResponse {
+  success?: false;
+  code?: number | string;
   message: string;
+  data?: {
+    errors?: Record<string, string[]>;
+    /**
+     * Why, in a word the app can act on. Sent for refusals that are about the
+     * school's subscription rather than the request: `school_not_found`,
+     * `school_suspended`, `subscription_expired`, `module_unavailable`,
+     * `plan_limit`.
+     */
+    reason?: string;
+    [detail: string]: unknown;
+  } | null;
+  /** Answers from before the envelope put these at the top level. */
   errors?: Record<string, string[]>;
-  /**
-   * Why, in a word the app can act on. Sent by the platform for refusals
-   * that are about the school's subscription rather than the request:
-   * `school_not_found`, `school_suspended`, `subscription_expired`,
-   * `module_unavailable`, `plan_limit`.
-   */
-  code?: string;
 }
 
 /** Query params every index endpoint accepts. */

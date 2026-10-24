@@ -19,6 +19,7 @@ import {
   FileDown,
   FileSpreadsheet,
   GraduationCap,
+  HandCoins,
   HardHat,
   HeartHandshake,
   LayoutDashboard,
@@ -66,7 +67,7 @@ export interface Stat {
 
 export const STATS: Stat[] = [
   { value: '20+', label: 'modules in one app' },
-  { value: '11', label: 'ready-made roles' },
+  { value: '16', label: 'ready-made roles' },
   { value: '1 min', label: 'to set up a school' },
   { value: '24×7', label: 'from any device' },
 ];
@@ -103,8 +104,13 @@ export const MODULES: ModuleSummary[] = [
   {
     name: 'Fees',
     summary:
-      'Fee types, class-wise structures and discounts; collection with receipts, payment history and a dues report.',
+      'Class-wise structures, instalments and concessions; an office fee counter with printed receipts, a day book with the cash handover, and a dues report.',
     icon: Wallet,
+  },
+  {
+    name: 'Expenses',
+    summary: 'A voucher for every bill the school pays, filed by head of account, approved by the principal and counted in the day book.',
+    icon: HandCoins,
   },
   {
     name: 'Payroll',
@@ -197,7 +203,8 @@ export const MODULES: ModuleSummary[] = [
   },
   {
     name: 'Roles & permissions',
-    summary: 'Eleven built-in roles, roles of your own, and the matrix that says who may do what.',
+    summary:
+      'Sixteen built-in roles and your own: a View / Create / Edit / Delete / Approve / Export matrix, class-wise scope, hidden fields, personal overrides and an access log.',
     icon: ShieldCheck,
   },
   {
@@ -214,21 +221,16 @@ export interface RoleSummary {
   icon: LucideIcon;
 }
 
-/** What each built-in role is for, in the words of its permission set. */
+/** What each of the sixteen built-in roles is responsible for, in the words of its permission set. */
 export const ROLE_SUMMARIES: RoleSummary[] = [
   {
     role: ROLES.superAdmin,
-    summary: 'Everything, including users, roles and permissions.',
+    summary: 'Full control of the school, and decides which role can see and do what.',
     icon: ShieldCheck,
   },
   {
-    role: ROLES.schoolAdmin,
-    summary: 'Runs the whole school: all the modules and settings, short of the permission list itself.',
-    icon: School,
-  },
-  {
     role: ROLES.principal,
-    summary: 'Academics, exams and attendance; decides leave, releases broadcasts, signs off payroll.',
+    summary: 'Academics, exams and attendance; grants leave, releases broadcasts, signs off payroll and expenses.',
     icon: Award,
   },
   {
@@ -237,18 +239,38 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
     icon: Medal,
   },
   {
+    role: ROLES.academicCoordinator,
+    summary: 'The academic plan: classes, subjects, timetable, homework and assignments.',
+    icon: School,
+  },
+  {
+    role: ROLES.examCoordinator,
+    summary: 'Exams end to end: date sheets, marks entry, report cards and publishing results.',
+    icon: FileSpreadsheet,
+  },
+  {
+    role: ROLES.classTeacher,
+    summary: 'Their own class: the register, students’ details, homework, report cards and parents.',
+    icon: Users,
+  },
+  {
     role: ROLES.teacher,
-    summary: 'Marks attendance, sets up exams and enters marks, files leave, reads the timetable.',
+    summary: 'Their subjects: attendance for their periods, homework, assignments and marks.',
     icon: Presentation,
   },
   {
     role: ROLES.accountant,
-    summary: 'Fees from end to end; builds the payroll but cannot approve it.',
+    summary: 'Runs the fee counter — receipts, the day book and the cash handover — and the expense book; builds the payroll but cannot approve it.',
     icon: Calculator,
   },
   {
+    role: ROLES.hrManager,
+    summary: 'Staff records and documents, staff attendance and leave, and the monthly payroll.',
+    icon: UserCog,
+  },
+  {
     role: ROLES.receptionist,
-    summary: 'Admits and updates students, drafts notices and messages, files leave requests.',
+    summary: 'Admissions and the front desk: new students, ID cards, notices and parents’ calls.',
     icon: ConciergeBell,
   },
   {
@@ -257,18 +279,28 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
     icon: Library,
   },
   {
+    role: ROLES.transportManager,
+    summary: 'The fleet: vehicles, routes and stops, drivers, and which student rides where.',
+    icon: Bus,
+  },
+  {
+    role: ROLES.hostelWarden,
+    summary: 'Boarding: rooms and beds, allocations, the nightly roll call and boarders’ leave.',
+    icon: BedDouble,
+  },
+  {
     role: ROLES.staff,
-    summary: 'Reads notices, attendance and reports; applies for leave.',
+    summary: 'Reads notices and applies for their own leave.',
     icon: HardHat,
   },
   {
     role: ROLES.parent,
-    summary: 'Read-only: attendance, fees, exams, timetable, transport and hostel. Can request leave.',
+    summary: 'Their own children only: attendance, fees, results, homework, transport. Can request leave.',
     icon: HeartHandshake,
   },
   {
     role: ROLES.student,
-    summary: 'Read-only: attendance, exams, notices, library and timetable.',
+    summary: 'Their own records: attendance, results, homework, timetable and library.',
     icon: Backpack,
   },
 ];
@@ -287,7 +319,7 @@ export const HIGHLIGHTS: Highlight[] = [
   },
   {
     title: 'The right screen for each person',
-    body: 'Eleven ready-made roles, plus your own. Parents and students see only their own child’s attendance, fees and results.',
+    body: 'Sixteen ready-made roles, plus your own. A class teacher sees their own class; parents and students see only their own child’s attendance, fees and results.',
     icon: Users,
   },
   {

@@ -55,9 +55,47 @@ export const PAYMENT_MODE_OPTIONS: Option<PaymentMode>[] = [
   { label: 'Cash', value: 'cash' },
   { label: 'UPI', value: 'upi' },
   { label: 'Card', value: 'card' },
-  { label: 'Cheque', value: 'cheque' },
+  { label: 'Cheque / DD', value: 'cheque' },
   { label: 'Bank transfer', value: 'bank_transfer' },
   { label: 'Online', value: 'online' },
+];
+
+/** What each mode's reference is called on the form and the receipt. */
+export const REFERENCE_LABELS: Record<PaymentMode, string> = {
+  cash: 'Reference',
+  upi: 'UPI transaction ID',
+  card: 'Card approval code',
+  cheque: 'Cheque / DD number',
+  bank_transfer: 'UTR / transfer reference',
+  online: 'Online payment ID',
+};
+
+/** What the form says when the reference is missing — the backend says the same. */
+export const REFERENCE_PROMPTS: Record<PaymentMode, string> = {
+  cash: 'Enter the reference',
+  upi: 'Enter the UPI transaction ID',
+  card: 'Enter the card approval code',
+  cheque: 'Enter the cheque or DD number',
+  bank_transfer: 'Enter the bank transfer reference (UTR)',
+  online: 'Enter the online payment ID',
+};
+
+/** Modes that come from a bank, so the bank's name is worth writing down. */
+export const BANK_MODES: readonly PaymentMode[] = ['cheque', 'bank_transfer'];
+
+/** Notes the counter counts at the end of the day, largest first. Coins are counted as one amount. */
+export const NOTE_VALUES = [500, 200, 100, 50, 20, 10] as const;
+
+/** Things a desk is asked to collect outside the fee structure. */
+export const CHARGE_SUGGESTIONS = [
+  'Books and notebooks',
+  'School uniform',
+  'ID card replacement',
+  'Transfer certificate fee',
+  'Exam re-appear fee',
+  'Annual day costume',
+  'Educational tour',
+  'Late admission fee',
 ];
 
 export const PAYMENT_MODE_LABELS: Record<PaymentMode, string> = Object.fromEntries(

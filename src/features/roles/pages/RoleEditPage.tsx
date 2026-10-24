@@ -96,7 +96,7 @@ export default function RoleEditPage() {
       <RoleForm
         // Remount when the record arrives so `defaultValues` are applied.
         key={role.id}
-        defaultValues={{ name: role.name, permissions: role.permissions }}
+        defaultValues={{ name: role.name, permissions: role.permissions, hidden_fields: role.hidden_fields ?? [] }}
         isSystemRole={role.is_system}
         isPending={updateRole.isPending}
         submitLabel="Save changes"

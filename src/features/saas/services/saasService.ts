@@ -1,10 +1,12 @@
 import { http } from '@/lib/axios';
+import { downloadFile } from '@/lib/download';
 import { publicApi } from '@/lib/publicApi';
 import type { ApiResource, CollectionResponse } from '@/types/api';
 
 import type {
   BillingCycle,
   LeadInput,
+  NewTicketInput,
   PublicPlan,
   SaasConfig,
   SchoolInfo,
@@ -12,6 +14,7 @@ import type {
   SignupInput,
   SignupResult,
   Subscription,
+  SupportTicket,
 } from '../types';
 
 /**
@@ -63,14 +66,14 @@ export const saasService = {
     return data.data;
   },
 
-  async changePlan(input: { plan_id: number; billing_cycle: BillingCycle }): Promise<SchoolInvoice> {
-    const { data } = await http.post<ApiResource<SchoolInvoice>>('/saas/subscription/change', input);
-    return data.data;
+  /** Raises an invoice for the chosen plan; the switch happens once it is paid. */
+  async changePlan(input: { plan_id: number; billing_cycle: BillingCycle }): Promise<{ invoice: SchoolInvoice; message: string }> {
+    const { data } = await http.post<ApiResource<SchoolInvoice> & { message: string }>('/saas/subscription/change', input);
+    return { invoice: data.data, message: data.message };
   },
 
-  async invoice(id: number, signal?: AbortSignal): Promise<SchoolInvoiceDocument> {
-    const { data } = await http.get<ApiResource<SchoolInvoiceDocument>>(`/saas/invoices/${id}`, { signal });
-    return data.data;
+  downloadInvoice(invoice: Pick<SchoolInvoice, 'id' | 'number'>): Promise<void> {
+    return downloadFile(`/saas/invoices/${invoice.id}/pdf`, `${invoice.number.replace(/\//g, '-')}.pdf`);
   },
 
   async createPaymentOrder(invoiceId: number): Promise<PaymentOrder> {
@@ -81,12 +84,39 @@ export const saasService = {
   async confirmPayment(
     invoiceId: number,
     input: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string },
-  ): Promise<SchoolInvoice> {
-    const { data } = await http.post<ApiResource<SchoolInvoice>>(
+  ): Promise<{ invoice: SchoolInvoice; message: string }> {
+    const { data } = await http.post<ApiResource<SchoolInvoice> & { message: string }>(
       `/saas/invoices/${invoiceId}/pay/confirm`,
       input,
     );
+    return { invoice: data.data, message: data.message };
+  },
+
+  // --- the school's support tickets -------------------------------------------
+
+  async tickets(signal?: AbortSignal): Promise<SupportTicket[]> {
+    const { data } = await http.get<CollectionResponse<SupportTicket>>('/saas/tickets', { signal });
     return data.data;
+  },
+
+  async ticket(id: number, signal?: AbortSignal): Promise<SupportTicket> {
+    const { data } = await http.get<ApiResource<SupportTicket>>(`/saas/tickets/${id}`, { signal });
+    return data.data;
+  },
+
+  async openTicket(input: NewTicketInput): Promise<{ ticket: SupportTicket; message: string }> {
+    const { data } = await http.post<ApiResource<SupportTicket> & { message: string }>('/saas/tickets', input);
+    return { ticket: data.data, message: data.message };
+  },
+
+  async replyToTicket(id: number, body: string): Promise<SupportTicket> {
+    const { data } = await http.post<ApiResource<SupportTicket>>(`/saas/tickets/${id}/messages`, { body });
+    return data.data;
+  },
+
+  async closeTicket(id: number): Promise<{ ticket: SupportTicket; message: string }> {
+    const { data } = await http.post<ApiResource<SupportTicket> & { message: string }>(`/saas/tickets/${id}/close`);
+    return { ticket: data.data, message: data.message };
   },
 };
 
@@ -98,25 +128,4 @@ export interface PaymentOrder {
   name: string;
   description: string;
   prefill: { name: string; email: string; contact: string };
-}
-
-/** An invoice with everything needed to print it. */
-export interface SchoolInvoiceDocument extends SchoolInvoice {
-  seller: {
-    company_name: string;
-    address: string;
-    gstin: string;
-    email: string;
-    phone: string;
-  };
-  buyer: {
-    name: string;
-    contact_name: string;
-    email: string;
-    phone: string;
-    city: string;
-    state: string;
-  };
-  payments: Array<{ id: number; amount: number; method: string; reference: string; paid_on: string }>;
-  payment_instructions: string;
 }

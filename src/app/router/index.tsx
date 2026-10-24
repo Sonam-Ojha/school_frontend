@@ -16,6 +16,7 @@ import { PAYROLL_PERMISSIONS } from '@/features/payroll/constants';
 import { TRANSPORT_PERMISSIONS } from '@/features/transport/constants';
 import { TIMETABLE_PERMISSIONS } from '@/features/timetable/constants';
 import { ATTENDANCE_PERMISSIONS } from '@/features/attendance/constants';
+import { EXPENSE_PERMISSIONS } from '@/features/expenses/constants';
 import { FEE_PERMISSIONS } from '@/features/fees/constants';
 import { HOMEWORK_PERMISSIONS } from '@/features/homework/constants';
 import { PERMISSION_PERMISSIONS, ROLE_PERMISSIONS } from '@/features/roles/constants';
@@ -437,6 +438,12 @@ const protectedRoutes: RouteObject[] = [
             }),
           },
           {
+            path: PATHS.feeDayBook,
+            lazy: async () => ({
+              Component: (await import('@/features/fees/pages/DayBookPage')).default,
+            }),
+          },
+          {
             path: PATHS.feeTypes,
             lazy: async () => ({
               Component: (await import('@/features/fees/pages/CataloguePages')).FeeTypesPage,
@@ -476,6 +483,18 @@ const protectedRoutes: RouteObject[] = [
         lazy: async () => ({
           Component: (await import('@/features/fees/pages/FeeStructurePages'))
             .FeeStructureEditPage,
+        }),
+      },
+    ],
+  },
+  // Expenses — what the school pays out.
+  {
+    element: <ProtectedRoute permissions={[EXPENSE_PERMISSIONS.read]} />,
+    children: [
+      {
+        path: PATHS.expenses,
+        lazy: async () => ({
+          Component: (await import('@/features/expenses/pages/ExpensesPage')).default,
         }),
       },
     ],
@@ -1011,6 +1030,41 @@ const protectedRoutes: RouteObject[] = [
         path: PATHS.permissions,
         lazy: async () => ({
           Component: (await import('@/features/roles/pages/PermissionListPage')).default,
+        }),
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoute permissions={[ROLE_PERMISSIONS.read, USER_PERMISSIONS.read]} />,
+    children: [
+      {
+        path: PATHS.accessLog,
+        lazy: async () => ({
+          Component: (await import('@/features/users/pages/AccessLogPage')).default,
+        }),
+      },
+    ],
+  },
+  // The school's own account with the platform: plan, invoices, support.
+  {
+    element: <ProtectedRoute permissions={[SETTINGS_PERMISSIONS.update]} />,
+    children: [
+      {
+        path: PATHS.subscription,
+        lazy: async () => ({
+          Component: (await import('@/features/saas/pages/SubscriptionPage')).default,
+        }),
+      },
+      {
+        path: PATHS.support,
+        lazy: async () => ({
+          Component: (await import('@/features/saas/pages/SupportPage')).default,
+        }),
+      },
+      {
+        path: PATHS.supportTicket,
+        lazy: async () => ({
+          Component: (await import('@/features/saas/pages/TicketPage')).default,
         }),
       },
     ],

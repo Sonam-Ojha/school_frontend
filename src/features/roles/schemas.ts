@@ -18,6 +18,8 @@ export const roleSchema = z.object({
   // No `.default()`: it would make the inferred input type optional and
   // desync the schema from what the form field actually holds.
   permissions: z.array(z.string()),
+  /** Groups of sensitive details kept from this role (contact, identity, medical, family, salary). */
+  hidden_fields: z.array(z.string()),
 });
 
 export type RoleInput = z.infer<typeof roleSchema>;

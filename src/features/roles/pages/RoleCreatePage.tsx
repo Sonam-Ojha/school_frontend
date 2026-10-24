@@ -23,7 +23,7 @@ export default function RoleCreatePage() {
       />
 
       <RoleForm
-        defaultValues={{ name: '', permissions: [] }}
+        defaultValues={{ name: '', permissions: [], hidden_fields: [] }}
         isPending={createRole.isPending}
         submitLabel="Create role"
         onCancel={() => navigate(PATHS.roles)}

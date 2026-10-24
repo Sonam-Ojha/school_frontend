@@ -42,8 +42,8 @@ export function RolesSection() {
     <Section
       id="roles"
       eyebrow="Who it is for"
-      title="Eleven roles, each with its own school"
-      lead="A role decides which dashboard opens, what the sidebar lists and which buttons exist. The API checks the same permissions again on every request."
+      title="Sixteen roles, each with its own responsibilities"
+      lead="A role decides which dashboard opens, what the menu lists and which buttons exist. The School Admin can adjust any role, give one person extra rights, limit a teacher to their own classes, and hide sensitive details — and every change is logged."
       className="border-y border-slate-200 bg-white"
     >
       <ul className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -53,9 +53,9 @@ export function RolesSection() {
           </RoleCell>
         ))}
 
-        {/* The twelfth cell: the built-in roles are a starting point, not a limit. */}
+        {/* The last cell: the built-in roles are a starting point, not a limit. */}
         <RoleCell icon={KeyRound} name="Your own roles" muted>
-          Build a new one from the matrix of 137 permissions, down to who may approve what.
+          Build a new one from the permission matrix — view, create, edit, delete, approve, export — and give one person several roles.
         </RoleCell>
       </ul>
     </Section>

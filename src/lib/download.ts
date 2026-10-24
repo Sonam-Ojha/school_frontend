@@ -63,11 +63,17 @@ async function blobErrorToApiError(error: unknown): Promise<ApiError> {
 
   if (data instanceof Blob && data.type.includes('json')) {
     try {
-      const parsed = JSON.parse(await data.text()) as { message?: string; errors?: Record<string, string[]> };
+      const parsed = JSON.parse(await data.text()) as {
+        message?: string;
+        errors?: Record<string, string[]>;
+        data?: { errors?: Record<string, string[]>; reason?: string } | null;
+      };
       return new ApiError(
         parsed.message ?? apiError.message,
         response?.status ?? apiError.status,
-        parsed.errors ?? {},
+        parsed.data?.errors ?? parsed.errors ?? {},
+        false,
+        parsed.data?.reason ?? null,
       );
     } catch {
       // Fall through to the generic error below.

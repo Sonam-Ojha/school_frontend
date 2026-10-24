@@ -13,8 +13,10 @@ export class ApiError extends Error {
   readonly status: number;
   readonly errors: Record<string, string[]>;
   readonly isNetworkError: boolean;
-  /** The platform's reason for a subscription refusal, e.g. `subscription_expired`. */
+  /** The platform's reason for a refusal, e.g. `subscription_expired` (sent as `data.reason`). */
   readonly code: string | null;
+  /** Anything else the refusal carried in `data`, such as the plan limit that was reached. */
+  readonly details: Record<string, unknown>;
 
   constructor(
     message: string,
@@ -22,6 +24,7 @@ export class ApiError extends Error {
     errors: Record<string, string[]> = {},
     isNetworkError = false,
     code: string | null = null,
+    details: Record<string, unknown> = {},
   ) {
     super(message);
     this.name = 'ApiError';
@@ -29,6 +32,12 @@ export class ApiError extends Error {
     this.errors = errors;
     this.isNetworkError = isNetworkError;
     this.code = code;
+    this.details = details;
+  }
+
+  /** 402 — the school's plan or subscription does not allow this. */
+  get isSubscriptionRefusal(): boolean {
+    return this.status === 402;
   }
 
   /** 422 — Laravel FormRequest rejected the payload. */
@@ -88,12 +97,15 @@ export function toApiError(error: unknown): ApiError {
     }
 
     const { status, data } = error.response;
+    const details = data?.data && typeof data.data === 'object' ? data.data : {};
+    const reason = typeof details.reason === 'string' ? details.reason : typeof data?.code === 'string' ? data.code : null;
     return new ApiError(
-      data?.message?.trim() || STATUS_MESSAGES[status] || DEFAULT_MESSAGE,
+      (typeof data?.message === 'string' && data.message.trim()) || STATUS_MESSAGES[status] || DEFAULT_MESSAGE,
       status,
-      data?.errors ?? {},
+      details.errors ?? data?.errors ?? {},
       false,
-      typeof data?.code === 'string' ? data.code : null,
+      reason,
+      details,
     );
   }
 

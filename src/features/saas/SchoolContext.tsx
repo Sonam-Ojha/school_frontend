@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Building2, Search } from 'lucide-react';
+import { Building2, Lock, Mail, Phone, Search } from 'lucide-react';
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
 
 import { rememberSchool, schoolCode } from '@/app/tenant';
@@ -49,8 +49,66 @@ export function SchoolGate({ code, children }: { code: string; children: ReactNo
     return <SchoolNotFound code={code} />;
   }
 
+  // Every request of a suspended school is refused, so say so instead of a sign-in that cannot work.
+  if (query.data?.access === 'blocked') {
+    return <SchoolSuspended info={query.data} />;
+  }
+
   return (
     <SchoolContext.Provider value={{ code, info: query.data ?? null }}>{children}</SchoolContext.Provider>
+  );
+}
+
+function SchoolSuspended({ info }: { info: SchoolInfo }) {
+  const config = useQuery({
+    queryKey: queryKeys.saas.config(),
+    queryFn: ({ signal }) => saasService.config(signal),
+    staleTime: 15 * 60_000,
+    meta: { skipGlobalError: true },
+  });
+  const support = config.data;
+
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-slate-50 px-6 text-center">
+      <span className="flex size-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+        <Lock className="size-7" aria-hidden />
+      </span>
+      <h1 className="mt-5 text-xl font-semibold text-slate-900">{info.name} is unavailable</h1>
+      <p className="mt-2 max-w-md text-sm text-slate-500">
+        {info.state === 'cancelled'
+          ? 'This school’s subscription has been cancelled, so it cannot be opened.'
+          : 'This school’s account has been suspended, so it cannot be opened right now.'}{' '}
+        Nothing has been deleted. The school’s administrator can contact support to have it reactivated.
+      </p>
+      {support && (support.support_email || support.support_phone) && (
+        <div className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+          {support.support_email && (
+            <a
+              href={`mailto:${support.support_email}`}
+              className="inline-flex items-center gap-1.5 text-brand-600 hover:underline"
+            >
+              <Mail className="size-4" aria-hidden />
+              {support.support_email}
+            </a>
+          )}
+          {support.support_phone && (
+            <a
+              href={`tel:${support.support_phone.replace(/\s/g, '')}`}
+              className="inline-flex items-center gap-1.5 text-brand-600 hover:underline"
+            >
+              <Phone className="size-4" aria-hidden />
+              {support.support_phone}
+            </a>
+          )}
+        </div>
+      )}
+      <a
+        href="/"
+        className="mt-6 inline-flex h-10 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      >
+        Go to the website
+      </a>
+    </div>
   );
 }
 

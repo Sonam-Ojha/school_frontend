@@ -36,6 +36,15 @@ export interface UserAccount {
   links: UserLinks;
   /** The same links by name, for display. */
   linked: { students: LinkedPerson[]; teacher: LinkedPerson | null; staff: LinkedPerson | null };
+  /** Personal overrides on top of the roles. */
+  granted_permissions: string[];
+  revoked_permissions: string[];
+  /** Classes, sections and subjects a member of staff is limited to; null is the whole school. */
+  access_scope: { class_ids: number[]; section_ids: number[]; subject_ids: number[] } | null;
+  /** The same scope in words, e.g. “Class 9-B”. */
+  access_scope_label: string | null;
+  /** What the person can actually do: roles and overrides together. */
+  effective_permissions: string[];
   last_login_at: string | null;
   created_at: string;
   updated_at: string;
@@ -54,4 +63,8 @@ export interface UserPayload {
   student_ids?: number[];
   teacher_id?: number | null;
   staff_id?: number | null;
+  /** Sent only by the School Admin. */
+  granted_permissions?: string[];
+  revoked_permissions?: string[];
+  access_scope?: { class_ids: number[]; section_ids: number[]; subject_ids: number[] } | null;
 }

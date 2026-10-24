@@ -36,6 +36,13 @@ const base = z.object({
   student_ids: z.array(z.number()),
   teacher_id: z.number().nullable(),
   staff_id: z.number().nullable(),
+  // Set by the School Admin only: rights beyond the roles, rights taken
+  // away, and the classes, sections and subjects a teacher works within.
+  granted_permissions: z.array(z.string()),
+  revoked_permissions: z.array(z.string()),
+  scope_class_ids: z.array(z.number()),
+  scope_section_ids: z.array(z.number()),
+  scope_subject_ids: z.array(z.number()),
 });
 
 /** A new account always needs a password. */

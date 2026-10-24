@@ -9,7 +9,6 @@ import {
   Layers,
   LayoutDashboard,
   LifeBuoy,
-  LogOut,
   Menu,
   Receipt,
   Settings,
@@ -18,15 +17,17 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { Suspense, useEffect, useState, type ReactNode } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Suspense, useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
+import { AccountMenu } from '@/components/layout/AccountMenu';
+import { Reveal } from '@/components/layout/Reveal';
+import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { env } from '@/config/env';
 import { cn } from '@/lib/cn';
-import { initials } from '@/lib/format';
 
 import { can, platformApi } from '../api';
 import { usePlatformAuth } from '../store';
@@ -82,31 +83,6 @@ export const PLATFORM_TABS: TabGroup[] = [
 ];
 
 const ALL_TABS = PLATFORM_TABS.flatMap((group) => group.tabs);
-
-/**
- * On a desktop the menu rests as a rail of icons and opens out while the
- * pointer is on it (or a key has moved focus into it), folding back when it
- * leaves; the page beside it slides across as it does. `rail` is that mode;
- * the mobile drawer always shows everything.
- *
- * `Reveal` is what opens: its column grows from nothing to the width of
- * what it holds (a grid track animates where `width: auto` cannot), so the
- * menu glides to exactly the width of its longest entry and back, while the
- * words fade in and out.
- */
-function Reveal({ rail, children, className }: { rail: boolean; children: ReactNode; className?: string }) {
-  if (!rail) return <span className={className}>{children}</span>;
-  return (
-    <span
-      className={cn(
-        'grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-300 ease-out motion-reduce:transition-none',
-        'group-hover:grid-cols-[1fr] group-hover:opacity-100 group-focus-within:grid-cols-[1fr] group-focus-within:opacity-100',
-      )}
-    >
-      <span className={cn('min-w-0 overflow-hidden', className)}>{children}</span>
-    </span>
-  );
-}
 
 function Brand({ rail }: { rail: boolean }) {
   return (
@@ -179,6 +155,7 @@ export function PlatformLayout() {
   const title = useTabTitle();
   const user = usePlatformAuth((state) => state.user);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = `${title} · Super Admin · ${env.appName}`;
@@ -207,9 +184,7 @@ export function PlatformLayout() {
         {user && (
           <div className="shrink-0 border-t border-slate-200 p-3">
             <div className="flex items-center px-1.5">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
-                {initials(user.name)}
-              </span>
+              <Avatar name={user.name} size="sm" className="size-8" online />
               <Reveal rail>
                 <span className="block pr-1 pl-3 text-xs whitespace-nowrap text-slate-500">
                   Signed in as <span className="font-medium text-slate-900">{user.role_label}</span>
@@ -257,18 +232,14 @@ export function PlatformLayout() {
           </p>
           <div className="flex-1" />
           {user && (
-            <div className="flex items-center gap-3">
-              <div className="hidden text-right sm:block">
-                <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                <p className="text-xs text-slate-500">{user.role_label}</p>
-              </div>
-              <span className="flex size-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
-                {initials(user.name)}
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => logout.mutate()} isLoading={logout.isPending} leftIcon={<LogOut className="size-4" />}>
-                <span className="hidden sm:inline">Sign out</span>
-              </Button>
-            </div>
+            <AccountMenu
+              name={user.name}
+              email={user.email}
+              subtitle={user.role_label}
+              items={can(user, 'settings.manage') ? [{ label: 'Settings & password', icon: Settings, onSelect: () => navigate('/settings') }] : []}
+              onSignOut={() => logout.mutate()}
+              isSigningOut={logout.isPending}
+            />
           )}
         </header>
 

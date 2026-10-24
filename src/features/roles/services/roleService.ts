@@ -11,6 +11,7 @@ const base = createCrudService<Role, RolePayload>('/roles');
 const toPayload = (input: RoleInput): RolePayload => ({
   name: input.name.trim().toLowerCase(),
   permissions: input.permissions,
+  hidden_fields: input.hidden_fields,
 });
 
 /**

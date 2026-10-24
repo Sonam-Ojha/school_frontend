@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { amountsEqual, fromMinor, sumAmounts, toMinor } from '@/lib/money';
 import { optionalText } from '@/lib/validation';
 
-import { MAX_FEE_AMOUNT, MAX_INSTALLMENTS, REFERENCE_REQUIRED_MODES } from './constants';
+import { MAX_FEE_AMOUNT, MAX_INSTALLMENTS, REFERENCE_PROMPTS, REFERENCE_REQUIRED_MODES } from './constants';
 
 /** A required money field. Blank numeric inputs yield `NaN`, hence the message. */
 const money = (label: string) =>
@@ -118,13 +118,26 @@ export const collectPaymentSchema = z
     fine_amount: money('the fine'),
     paid_at: z.string().min(1, 'Payment date is required'),
     remarks: optionalText(200, 'Remarks are too long'),
+    /** The dues being paid; empty means the oldest first, as far as the money goes. */
+    due_ids: z.array(z.number().int().positive()).default([]),
+    received_from: optionalText(120, 'Keep the name under 120 characters').default(''),
+    bank_name: optionalText(80, 'Keep the bank name under 80 characters').default(''),
+    instrument_date: z.string().default(''),
   })
   // Cash is the only mode with no reference to record; for the rest the
   // reference is the only trace that the money actually moved.
   .refine(
     (data) => !REFERENCE_REQUIRED_MODES.includes(data.mode) || data.reference.trim() !== '',
-    { message: 'A transaction reference is required for this mode', path: ['reference'] },
+    (data) => ({ message: REFERENCE_PROMPTS[data.mode], path: ['reference'] }),
   );
+
+/** A charge added at the desk: books, uniform, a lost ID card. */
+export const addChargeSchema = z.object({
+  label: z.string().trim().min(2, 'Say what the charge is for').max(80, 'Keep it under 80 characters'),
+  amount: money('the amount').refine((value) => value > 0, 'Enter an amount greater than zero'),
+  due_date: z.string().min(1, 'Choose the due date'),
+});
+
 
 export const cancelPaymentSchema = z.object({
   reason: z
@@ -140,3 +153,4 @@ export type InstallmentInput = z.infer<typeof installmentSchema>;
 export type FeeStructureInput = z.infer<typeof feeStructureSchema>;
 export type CollectPaymentInput = z.infer<typeof collectPaymentSchema>;
 export type CancelPaymentInput = z.infer<typeof cancelPaymentSchema>;
+export type AddChargeInput = z.infer<typeof addChargeSchema>;

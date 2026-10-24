@@ -3,8 +3,8 @@ import { createCrudService } from '@/lib/createCrudService';
 import { downloadFile, timestampedFilename } from '@/lib/download';
 import type { ApiResource, ListQueryParams } from '@/types/api';
 
-import type { CancelPaymentInput, CollectPaymentInput } from '../schemas';
-import type { DueReportRow, DueReportTotals, Payment, StudentFeeAccount } from '../types';
+import type { AddChargeInput, CancelPaymentInput, CollectPaymentInput } from '../schemas';
+import type { DayBook, DayClose, DueReportRow, DueReportTotals, Payment, StudentFeeAccount } from '../types';
 
 const paymentCrud = createCrudService<Payment>('/fees/payments');
 
@@ -39,6 +39,7 @@ export const collectionService = {
    * receipt. Sending a client-computed split would race a concurrent payment.
    */
   async collect(input: CollectPaymentInput): Promise<Payment> {
+    const fromBank = input.mode === 'cheque' || input.mode === 'bank_transfer';
     const { data } = await http.post<ApiResource<Payment>>('/fees/payments', {
       student_id: input.student_id,
       amount: input.amount,
@@ -48,8 +49,62 @@ export const collectionService = {
       fine_amount: input.fine_amount,
       paid_at: input.paid_at,
       remarks: input.remarks.trim() || null,
+      ...(input.due_ids.length > 0 ? { due_ids: input.due_ids } : {}),
+      received_from: input.received_from.trim() || null,
+      bank_name: input.mode === 'cash' ? null : input.bank_name.trim() || null,
+      instrument_date: fromBank && input.instrument_date ? input.instrument_date : null,
     });
     return data.data;
+  },
+
+  /** Adds a one-off charge (books, uniform, a lost ID card) to a student's account. */
+  async addCharge(studentId: number, input: AddChargeInput): Promise<{ account: StudentFeeAccount; message: string }> {
+    const { data } = await http.post<ApiResource<StudentFeeAccount> & { message: string }>(
+      `/fees/students/${studentId}/charges`,
+      { label: input.label.trim(), amount: input.amount, due_date: input.due_date },
+    );
+    return { account: data.data, message: data.message };
+  },
+
+  /** Takes a desk charge off again, while nothing has been paid against it. */
+  async removeCharge(studentId: number, dueId: number): Promise<{ account: StudentFeeAccount; message: string }> {
+    const { data } = await http.delete<ApiResource<StudentFeeAccount> & { message: string }>(
+      `/fees/students/${studentId}/charges/${dueId}`,
+    );
+    return { account: data.data, message: data.message };
+  },
+
+  /** One day at the counter: receipts, money by mode, expenses and the cash to hand over. */
+  async dayBook(date: string, collector: string | null, signal?: AbortSignal): Promise<DayBook> {
+    const { data } = await http.get<ApiResource<DayBook>>('/fees/day-book', {
+      params: { date, ...(collector ? { collector } : {}) },
+      signal,
+    });
+    return data.data;
+  },
+
+  /** Records the cash counted at the end of the day against what the day book expects. */
+  async closeDay(input: {
+    date: string;
+    collector: string | null;
+    denominations: Record<string, number>;
+    coins: number;
+    remarks: string;
+  }): Promise<{ close: DayClose; message: string }> {
+    const { data } = await http.post<ApiResource<DayClose> & { message: string }>('/fees/day-book/close', {
+      date: input.date,
+      collector: input.collector,
+      denominations: input.denominations,
+      coins: input.coins,
+      remarks: input.remarks.trim() || null,
+    });
+    return { close: data.data, message: data.message };
+  },
+
+  async exportDayBook(date: string, collector: string | null, format: 'pdf' | 'excel'): Promise<void> {
+    await downloadFile('/fees/day-book/export', `day-book-${date}.${format === 'excel' ? 'xlsx' : 'pdf'}`, {
+      params: { date, format, ...(collector ? { collector } : {}) },
+    });
   },
 
   listPayments: paymentCrud.list,

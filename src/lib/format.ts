@@ -116,3 +116,55 @@ export function initials(name: string): string {
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
 }
+
+const ONES = [
+  '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen',
+  'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen',
+];
+const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+const belowHundred = (n: number): string => (n < 20 ? ONES[n]! : `${TENS[Math.floor(n / 10)]}${n % 10 ? ` ${ONES[n % 10]}` : ''}`);
+
+const belowThousand = (n: number): string =>
+  [Math.floor(n / 100) ? `${ONES[Math.floor(n / 100)]} Hundred` : '', n % 100 ? belowHundred(n % 100) : '']
+    .filter(Boolean)
+    .join(' ');
+
+/**
+ * An amount in words, the Indian way, as receipts write it:
+ * 1,12,500.50 → "Rupees One Lakh Twelve Thousand Five Hundred and Fifty Paise Only".
+ */
+export function rupeesInWords(amount: number): string {
+  const whole = Math.floor(Math.abs(amount));
+  const paise = Math.round((Math.abs(amount) - whole) * 100);
+
+  const parts: string[] = [];
+  let rest = whole;
+  const crore = Math.floor(rest / 1_00_00_000);
+  rest %= 1_00_00_000;
+  const lakh = Math.floor(rest / 1_00_000);
+  rest %= 1_00_000;
+  const thousand = Math.floor(rest / 1000);
+  rest %= 1000;
+
+  if (crore) parts.push(`${belowThousand(crore)} Crore`);
+  if (lakh) parts.push(`${belowHundred(lakh)} Lakh`);
+  if (thousand) parts.push(`${belowHundred(thousand)} Thousand`);
+  if (rest) parts.push(belowThousand(rest));
+
+  const rupees = parts.length > 0 ? parts.join(' ') : 'Zero';
+  return `Rupees ${rupees}${paise ? ` and ${belowHundred(paise)} Paise` : ''} Only`;
+}
+
+/**
+ * A `wa.me` link that opens WhatsApp with a message ready to send. Indian
+ * numbers are written many ways (`98765 43210`, `+91-98765-43210`,
+ * `098765…`); all become `919876543210`. Null when there is no usable number.
+ */
+export function whatsAppLink(phone: string | null | undefined, text: string): string | null {
+  let digits = String(phone ?? '').replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+  if (digits.length === 10) digits = `91${digits}`;
+  if (digits.length < 11 || digits.length > 13) return null;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+}

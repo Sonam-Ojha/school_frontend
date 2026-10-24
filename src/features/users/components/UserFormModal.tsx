@@ -10,8 +10,9 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
-import { useTeacherOptions } from '@/features/academics';
-import { isSuperAdminRole } from '@/features/roles/constants';
+import { useClassOptions, useSubjectOptions, useTeacherOptions } from '@/features/academics';
+import { isSuperAdminRole, permissionLabel } from '@/features/roles/constants';
+import { usePermissions } from '@/features/roles/hooks/usePermissions';
 import { useRoleOptions } from '@/features/roles/hooks/useRoles';
 import type { Role } from '@/features/roles/types';
 import { useStaffOptions } from '@/features/staff/hooks/useStaff';
@@ -36,6 +37,8 @@ const FIELDS = [
   'student_ids',
   'teacher_id',
   'staff_id',
+  'granted_permissions',
+  'revoked_permissions',
 ] as const;
 const FORM_ID = 'user-form';
 
@@ -130,6 +133,11 @@ function UserForm({ user, roles, onSubmit }: UserFormProps) {
           student_ids: user.links?.student_ids ?? [],
           teacher_id: user.links?.teacher_id ?? null,
           staff_id: user.links?.staff_id ?? null,
+          granted_permissions: user.granted_permissions ?? [],
+          revoked_permissions: user.revoked_permissions ?? [],
+          scope_class_ids: user.access_scope?.class_ids ?? [],
+          scope_section_ids: user.access_scope?.section_ids ?? [],
+          scope_subject_ids: user.access_scope?.subject_ids ?? [],
         }
       : {
           name: '',
@@ -141,8 +149,25 @@ function UserForm({ user, roles, onSubmit }: UserFormProps) {
           student_ids: [],
           teacher_id: null,
           staff_id: null,
+          granted_permissions: [],
+          revoked_permissions: [],
+          scope_class_ids: [],
+          scope_section_ids: [],
+          scope_subject_ids: [],
         },
   });
+
+  // The finer controls are the School Admin's alone: anybody else could raise themselves.
+  const classes = useClassOptions();
+  const subjects = useSubjectOptions();
+  const permissionList = usePermissions();
+  const sectionOptions = classes.classes.flatMap((klass) =>
+    klass.sections.map((section) => ({ label: `${klass.name} — ${section.name}`, value: section.id })),
+  );
+  const permissionOptions = (permissionList.data ?? []).map((permission) => ({
+    label: permissionLabel(permission.name),
+    value: permission.name,
+  }));
 
   const chosenRoles = roles
     .filter((role) => form.watch('role_ids').includes(role.id))
@@ -165,6 +190,7 @@ function UserForm({ user, roles, onSubmit }: UserFormProps) {
         // An edit always says who the account is. A new account says so only
         // if somebody chose — otherwise the API matches it by email address.
         sendLinks: isEdit || Boolean(touched.student_ids || touched.teacher_id || touched.staff_id),
+        sendAccess: isSuperAdmin,
       },
       (error) => {
         // The API reports role problems against `roles`; the picker is `role_ids`.
@@ -246,6 +272,64 @@ function UserForm({ user, roles, onSubmit }: UserFormProps) {
           hint="For a staff member's own leave and attendance."
           valueAsNumber
         />
+
+        {isSuperAdmin && !isFamily && !chosenRoles.includes(ROLES.superAdmin) && (
+          <FormFullRow>
+            <fieldset className="space-y-4 rounded-lg border border-slate-200 p-4">
+              <legend className="px-1 text-sm font-semibold text-slate-900">Access scope</legend>
+              <p className="text-xs text-slate-500">
+                Limit this person to some classes, sections or subjects — a class teacher to their own class, a
+                subject teacher to their subject. Leave all three empty for the whole school.
+              </p>
+              <FormGrid cols={3}>
+                <FormMultiSelect<UserInput>
+                  name="scope_class_ids"
+                  label="Whole classes"
+                  options={classes.classOptions}
+                  placeholder="Any class"
+                />
+                <FormMultiSelect<UserInput>
+                  name="scope_section_ids"
+                  label="Sections"
+                  options={sectionOptions}
+                  placeholder="Any section"
+                />
+                <FormMultiSelect<UserInput>
+                  name="scope_subject_ids"
+                  label="Subjects"
+                  options={subjects.subjectOptions}
+                  placeholder="Any subject"
+                />
+              </FormGrid>
+            </fieldset>
+          </FormFullRow>
+        )}
+
+        {isSuperAdmin && !chosenRoles.includes(ROLES.superAdmin) && (
+          <FormFullRow>
+            <fieldset className="space-y-4 rounded-lg border border-slate-200 p-4">
+              <legend className="px-1 text-sm font-semibold text-slate-900">Permission overrides for this person</legend>
+              <p className="text-xs text-slate-500">
+                On top of their roles: rights only this person has, and rights their roles give that they should not
+                have. Every change is written to the access log.
+              </p>
+              <FormGrid cols={2}>
+                <FormMultiSelect<UserInput, string>
+                  name="granted_permissions"
+                  label="Also allow"
+                  options={permissionOptions}
+                  placeholder="Nothing extra"
+                />
+                <FormMultiSelect<UserInput, string>
+                  name="revoked_permissions"
+                  label="Take away"
+                  options={permissionOptions}
+                  placeholder="Nothing taken away"
+                />
+              </FormGrid>
+            </fieldset>
+          </FormFullRow>
+        )}
 
         <FormFullRow>
           {isSelf ? (

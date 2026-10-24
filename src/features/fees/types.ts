@@ -120,6 +120,12 @@ export interface StudentDue {
   status: DueStatus;
   /** Whole days past the due date; zero when not overdue. */
   days_overdue: number;
+  /** An instalment of the class's structure, or a charge added for this student alone. */
+  kind?: 'installment' | 'charge';
+  /** What raised a charge: the hostel, or the fee desk. */
+  charge_source?: 'hostel' | 'other' | null;
+  /** A desk charge with nothing paid against it can be taken off again. */
+  removable?: boolean;
 }
 
 /** A student's whole fee position for the current year. */
@@ -127,9 +133,15 @@ export interface StudentFeeAccount {
   student_id: number;
   student_name: string;
   admission_no: string;
+  roll_no?: string | null;
   photo_url: string | null;
   class_name: string;
   section_name: string | null;
+  /** The father where one is recorded, otherwise the primary guardian — as a receipt names them. */
+  guardian_name?: string | null;
+  guardian_relation?: string | null;
+  guardian_phone?: string | null;
+  guardian_email?: string | null;
   structure_id: number | null;
   structure_name: string | null;
   total_payable: number;
@@ -154,8 +166,14 @@ export interface Payment {
   student_id: number;
   student_name: string;
   admission_no: string;
+  roll_no?: string | null;
   class_name: string;
   section_name: string | null;
+  /** As they stood when the money was taken. */
+  guardian_name?: string | null;
+  guardian_relation?: string | null;
+  /** Who handed the money over at the desk. */
+  received_from?: string | null;
   paid_at: string;
   amount: number;
   discount_amount: number;
@@ -163,11 +181,92 @@ export interface Payment {
   mode: PaymentMode;
   /** Cheque number, UPI reference, transaction id. */
   reference: string | null;
+  /** The bank a cheque or transfer came from. */
+  bank_name?: string | null;
+  /** The date written on a cheque. */
+  instrument_date?: string | null;
   remarks: string | null;
   collected_by: string;
+  collected_at?: string;
   is_cancelled: boolean;
   cancelled_reason: string | null;
+  cancelled_by?: string | null;
   allocations: PaymentAllocation[];
+  /** What the student still owed once this payment was taken. */
+  balance_after?: number;
+}
+
+/** One receipt as the day book lists it. */
+export interface DayBookReceipt {
+  id: number;
+  receipt_no: string;
+  time: string;
+  student_id: number;
+  student_name: string;
+  admission_no: string;
+  class_name: string;
+  section_name: string | null;
+  received_from: string | null;
+  mode: PaymentMode;
+  mode_label: string;
+  reference: string | null;
+  bank_name: string | null;
+  amount: number;
+  towards: string;
+  collected_by: string;
+  cancelled_reason: string | null;
+}
+
+export interface DayClose {
+  id: number;
+  date: string;
+  collector: string | null;
+  expected_cash: number;
+  counted_cash: number;
+  difference: number;
+  denominations: Record<string, number>;
+  coins: number;
+  remarks: string | null;
+  closed_by: string;
+  closed_at: string;
+}
+
+/** One day at the fee counter: receipts, money by mode, expenses paid and the cash to hand over. */
+export interface DayBook {
+  date: string;
+  collector: string | null;
+  collectors: Array<{ name: string; receipts: number; amount: number; cash: number }>;
+  totals: {
+    receipts: number;
+    amount: number;
+    discount: number;
+    fine: number;
+    cancelled: number;
+    cancelled_amount: number;
+  };
+  by_mode: Array<{ mode: PaymentMode; label: string; receipts: number; amount: number }>;
+  receipts: DayBookReceipt[];
+  cancelled: DayBookReceipt[];
+  expenses: {
+    count: number;
+    amount: number;
+    cash: number;
+    items: Array<{
+      id: number;
+      voucher_no: string;
+      paid_to: string;
+      category_name: string;
+      amount: number;
+      mode: PaymentMode;
+      mode_label: string;
+      status: string;
+      recorded_by: string;
+      recorded_at: string;
+      description: string | null;
+    }>;
+  };
+  cash: { received: number; paid_out: number; expected: number };
+  close: DayClose | null;
 }
 
 /** One row of the outstanding-dues report. */

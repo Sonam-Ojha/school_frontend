@@ -48,7 +48,7 @@ export function AvatarUploader({ user }: { user: AuthUser }) {
 
   return (
     <div className="flex items-center gap-4">
-      <Avatar name={user.name} src={preview ?? user.avatar_url} size="lg" />
+      <Avatar name={user.name} src={preview ?? user.avatar_url} size="lg" online />
 
       <div>
         <input

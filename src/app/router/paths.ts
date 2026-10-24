@@ -69,6 +69,8 @@ export const PATHS = {
   feePayments: '/fees/payments',
   feeReceipt: '/fees/payments/:id',
   feeDues: '/fees/dues',
+  /** One day at the counter: receipts, money by mode, expenses and the cash handed over. */
+  feeDayBook: '/fees/day-book',
   feeStructures: '/fees/structures',
   feeStructureCreate: '/fees/structures/new',
   feeStructureEdit: '/fees/structures/:id',
@@ -114,6 +116,9 @@ export const PATHS = {
   communicationNoticeDetail: '/communication/notices/:id',
   communicationTemplates: '/communication/templates',
   communicationChannels: '/communication/channels',
+
+  // Expenses — what the school pays out, recorded by the accountant, approved by the principal.
+  expenses: '/expenses',
 
   // Payroll
   payroll: '/payroll',
@@ -179,6 +184,8 @@ export const PATHS = {
   roleEdit: '/roles/:id/edit',
   permissions: '/permissions',
   users: '/users',
+  /** Who changed which role, permission or account, and when. */
+  accessLog: '/access-log',
 
   // School settings — tabs are real routes so each is linkable.
   settings: '/settings',
@@ -188,6 +195,12 @@ export const PATHS = {
   settingsLocalization: '/settings/regional',
   settingsEmail: '/settings/email',
   settingsSms: '/settings/sms',
+
+  // The school's own account with the platform — for the School Admin.
+  subscription: '/subscription',
+  support: '/support',
+  /** Pattern — build with `toPath(PATHS.supportTicket, { id })`. */
+  supportTicket: '/support/:id',
 
   forbidden: '/403',
 } as const;

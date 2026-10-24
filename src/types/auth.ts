@@ -32,6 +32,19 @@ export interface AuthUser {
   scoped_permissions?: string[];
   /** True when every role the user holds is a family role. */
   is_portal?: boolean;
+  /** Personal overrides on top of the roles: rights added, and rights taken away. */
+  granted_permissions?: string[];
+  revoked_permissions?: string[];
+  /** Classes, sections and subjects this member of staff is limited to; null is the whole school. */
+  access_scope?: AccessScope | null;
+  /** Groups of sensitive details this user's roles keep hidden from them. */
+  hidden_fields?: string[];
+}
+
+export interface AccessScope {
+  class_ids: number[];
+  section_ids: number[];
+  subject_ids: number[];
 }
 
 export interface UserLinks {
@@ -46,20 +59,31 @@ export interface AuthSession {
 }
 
 /**
- * Canonical role slugs. Keep in sync with the backend RoleSeeder.
+ * Canonical role slugs. Keep in sync with the backend (`src/engine/lib/roles.ts`).
  *
  * Declaration order is precedence, most privileged first — `roleRoutes` and
  * the role badges both rely on it.
+ *
+ * Inside a school, `super-admin` is the School Admin (full access). The
+ * platform's own Super Admin is not a school role: that account lives in the
+ * console at /superadmin. `school-admin` is kept only for schools created
+ * before the sixteen built-in roles.
  */
 export const ROLES = {
   superAdmin: 'super-admin',
   schoolAdmin: 'school-admin',
   principal: 'principal',
   vicePrincipal: 'vice-principal',
+  academicCoordinator: 'academic-coordinator',
+  examCoordinator: 'exam-coordinator',
+  classTeacher: 'class-teacher',
   teacher: 'teacher',
   accountant: 'accountant',
+  hrManager: 'hr-manager',
   receptionist: 'receptionist',
   librarian: 'librarian',
+  transportManager: 'transport-manager',
+  hostelWarden: 'hostel-warden',
   staff: 'staff',
   parent: 'parent',
   student: 'student',
@@ -69,15 +93,21 @@ export type Role = (typeof ROLES)[keyof typeof ROLES];
 
 /** Human-readable labels for the canonical roles. */
 export const ROLE_LABELS: Record<Role, string> = {
-  [ROLES.superAdmin]: 'Super Admin',
-  [ROLES.schoolAdmin]: 'School Admin',
+  [ROLES.superAdmin]: 'School Admin (Full Access)',
+  [ROLES.schoolAdmin]: 'Administrator (legacy)',
   [ROLES.principal]: 'Principal',
   [ROLES.vicePrincipal]: 'Vice Principal',
-  [ROLES.teacher]: 'Teacher',
+  [ROLES.academicCoordinator]: 'Academic Coordinator / HOD',
+  [ROLES.examCoordinator]: 'Exam Coordinator',
+  [ROLES.classTeacher]: 'Class Teacher',
+  [ROLES.teacher]: 'Subject Teacher',
   [ROLES.accountant]: 'Accountant',
-  [ROLES.receptionist]: 'Receptionist',
+  [ROLES.hrManager]: 'HR Manager',
+  [ROLES.receptionist]: 'Admission Officer / Front Office',
   [ROLES.librarian]: 'Librarian',
-  [ROLES.staff]: 'Staff',
+  [ROLES.transportManager]: 'Transport Manager',
+  [ROLES.hostelWarden]: 'Hostel Warden',
+  [ROLES.staff]: 'Support Staff',
   [ROLES.parent]: 'Parent',
   [ROLES.student]: 'Student',
 };

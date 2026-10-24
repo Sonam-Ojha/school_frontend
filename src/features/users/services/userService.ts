@@ -20,6 +20,13 @@ export interface UserWrite {
    * not sent, and the API matches the account to the rosters by email.
    */
   sendLinks: boolean;
+  granted_permissions: string[];
+  revoked_permissions: string[];
+  scope_class_ids: number[];
+  scope_section_ids: number[];
+  scope_subject_ids: number[];
+  /** True for the School Admin, the only one who may set overrides and scopes. */
+  sendAccess: boolean;
 }
 
 /** Emails are case-insensitive identifiers; an untouched password is not sent at all. */
@@ -32,6 +39,16 @@ const toPayload = (input: UserWrite): UserPayload => ({
   ...(input.password ? { password: input.password } : {}),
   ...(input.sendLinks
     ? { student_ids: input.student_ids, teacher_id: input.teacher_id, staff_id: input.staff_id }
+    : {}),
+  ...(input.sendAccess
+    ? {
+        granted_permissions: input.granted_permissions,
+        revoked_permissions: input.revoked_permissions,
+        access_scope:
+          input.scope_class_ids.length + input.scope_section_ids.length + input.scope_subject_ids.length === 0
+            ? null
+            : { class_ids: input.scope_class_ids, section_ids: input.scope_section_ids, subject_ids: input.scope_subject_ids },
+      }
     : {}),
 });
 

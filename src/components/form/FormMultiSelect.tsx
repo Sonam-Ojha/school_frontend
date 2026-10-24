@@ -7,9 +7,9 @@ import type { Option } from '@/types/common';
 import { FormField } from './FormField';
 import { useFieldError } from './useFieldError';
 
-interface FormMultiSelectProps<TFieldValues extends FieldValues> {
+interface FormMultiSelectProps<TFieldValues extends FieldValues, TValue extends string | number> {
   name: Path<TFieldValues>;
-  options: Option<number>[];
+  options: Option<TValue>[];
   label?: string;
   hint?: string;
   placeholder?: string;
@@ -24,7 +24,10 @@ interface FormMultiSelectProps<TFieldValues extends FieldValues> {
  * Driven through a controller rather than `register` — the control is not a
  * native input, so there is no change event for RHF to hook.
  */
-export function FormMultiSelect<TFieldValues extends FieldValues = FieldValues>({
+export function FormMultiSelect<
+  TFieldValues extends FieldValues = FieldValues,
+  TValue extends string | number = number,
+>({
   name,
   options,
   label,
@@ -33,7 +36,7 @@ export function FormMultiSelect<TFieldValues extends FieldValues = FieldValues>(
   required,
   disabled,
   emptyMessage,
-}: FormMultiSelectProps<TFieldValues>) {
+}: FormMultiSelectProps<TFieldValues, TValue>) {
   const { control } = useFormContext<TFieldValues>();
   const error = useFieldError<TFieldValues>(name);
   const id = useId();
@@ -45,7 +48,7 @@ export function FormMultiSelect<TFieldValues extends FieldValues = FieldValues>(
       <MultiSelect
         id={id}
         options={options}
-        value={(field.value as number[]) ?? []}
+        value={(field.value as TValue[]) ?? []}
         onChange={field.onChange}
         placeholder={placeholder}
         disabled={disabled}

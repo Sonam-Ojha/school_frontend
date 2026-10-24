@@ -6,25 +6,26 @@ import { ROLES } from '@/types/auth';
  * also the column order of the permission matrix.
  */
 export const PERMISSION_ACTIONS = [
-  'create',
   'read',
+  'create',
   'update',
   'delete',
+  'approve',
   'export',
   'print',
-  'approve',
 ] as const;
 
 export type PermissionAction = (typeof PERMISSION_ACTIONS)[number];
 
+/** As the quotation names them: View, Create, Edit, Delete, Approve, Export — and Print. */
 export const ACTION_LABELS: Record<PermissionAction, string> = {
+  read: 'View',
   create: 'Create',
-  read: 'Read',
-  update: 'Update',
+  update: 'Edit',
   delete: 'Delete',
+  approve: 'Approve',
   export: 'Export',
   print: 'Print',
-  approve: 'Approve',
 };
 
 /**
@@ -52,3 +53,19 @@ export const PERMISSION_PERMISSIONS = {
  * the checkboxes mean something.
  */
 export const isSuperAdminRole = (name: string): boolean => name === ROLES.superAdmin;
+
+const RESOURCE_NAMES: Record<string, string> = {
+  'academics.classes': 'Classes',
+  'academics.subjects': 'Subjects',
+  'academic-years': 'Academic years',
+};
+
+/** `students.create` → “Students: Create”, as the matrix names it. */
+export function permissionLabel(name: string): string {
+  const dot = name.lastIndexOf('.');
+  const resource = name.slice(0, dot);
+  const action = name.slice(dot + 1) as PermissionAction;
+  const label =
+    RESOURCE_NAMES[resource] ?? resource.charAt(0).toUpperCase() + resource.slice(1).replace(/[-.]/g, ' ');
+  return `${label}: ${ACTION_LABELS[action] ?? action}`;
+}

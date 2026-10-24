@@ -58,19 +58,36 @@ export function buildUserColumns({
       key: 'roles',
       header: 'Roles',
       hideBelow: 'sm',
-      cell: (user) => (
-        <div className="flex flex-wrap gap-1">
-          {user.roles.length === 0 ? (
-            <span className="text-slate-400">None</span>
-          ) : (
-            user.roles.map((role) => (
-              <Badge key={role} tone="neutral">
-                {roleLabel(role)}
-              </Badge>
-            ))
-          )}
-        </div>
-      ),
+      cell: (user) => {
+        const granted = user.granted_permissions?.length ?? 0;
+        const revoked = user.revoked_permissions?.length ?? 0;
+        return (
+          <div className="space-y-1">
+            <div className="flex flex-wrap gap-1">
+              {user.roles.length === 0 ? (
+                <span className="text-slate-400">None</span>
+              ) : (
+                user.roles.map((role) => (
+                  <Badge key={role} tone="neutral">
+                    {roleLabel(role)}
+                  </Badge>
+                ))
+              )}
+            </div>
+            {/* What the School Admin set for this person alone, on top of the roles. */}
+            {(granted > 0 || revoked > 0) && (
+              <p className="text-xs text-amber-700">
+                {[granted > 0 && `+${granted} extra`, revoked > 0 && `−${revoked} taken away`].filter(Boolean).join(' · ')}
+              </p>
+            )}
+            {user.access_scope_label && (
+              <p className="truncate text-xs text-slate-500" title={user.access_scope_label}>
+                Limited to {user.access_scope_label}
+              </p>
+            )}
+          </div>
+        );
+      },
     },
     {
       // Who on the rosters the account is. For a parent or student this is

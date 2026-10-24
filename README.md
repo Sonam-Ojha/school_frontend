@@ -1,6 +1,7 @@
 # School ERP — Frontend
 
-React 19 + Vite + TypeScript + Tailwind CSS 4, talking to a Laravel 11 / Sanctum API.
+React 19 + Vite + TypeScript + Tailwind CSS 4, talking to the Node.js API in `school_backend`
+(Laravel-shaped resources and Sanctum-style tokens). The API runs one school, or many in SaaS mode.
 
 ## Getting started
 
@@ -65,6 +66,43 @@ that state directly.
 **Env.** `src/config/env.ts` parses `import.meta.env` through Zod at boot, so a
 misconfigured deploy fails immediately instead of surfacing as a confusing 404.
 
+**Responses.** Every API answer is `{ success, code, message, data }`. Services read `data`;
+`toApiError` takes the message, the per-field `data.errors` and the refusal `data.reason`
+(exposed as `ApiError.code`, e.g. `plan_limit`).
+
+## One bundle, three apps (SaaS)
+
+`src/app/tenant.ts` reads the first segment of the address and picks the app, each with its
+own router and `basename`:
+
+| Address | App | What it is |
+| ------- | --- | ---------- |
+| `/`, `/signup`, `/login`, `/pricing` | `PublicApp` | The website: landing page and pricing, a school's free-trial sign-up, and "find my school" by its code |
+| `/superadmin/…` | `features/platform/PlatformApp` | The Super Admin console: schools, plans, invoices, payments, renewals, support tickets, enquiries, revenue reports, audit log, team and settings |
+| `/<code>/…` | `SchoolApp` | One school's ERP, e.g. `/sunrise/students`. Links inside it never mention the code — the router adds it |
+
+Inside a school:
+
+- `SchoolGate` looks the code up first (`GET /saas/schools/:code`): an unknown code gets a
+  "school not found" page and a suspended school a page saying so, instead of a sign-in that
+  cannot work. Its name and logo brand the sign-in page and the sidebar.
+- The sidebar behaves exactly like the Super Admin console's (both use `components/layout/Reveal`):
+  a white rail of icons that opens out to the width of its longest entry on hover and folds back
+  when the pointer leaves, pushing the page across rather than covering it. The open tab is
+  filled with the brand colour. On a phone it is a drawer with everything shown.
+- Every request carries `X-School: <code>`, and each school keeps its own session
+  (`school-erp.auth.<code>`), so two schools can be open in two tabs.
+- Pages the school's plan leaves out are hidden from the menu and replaced by a notice
+  (`ModuleUnavailable`) if opened directly; the API refuses them anyway.
+- A strip under the top bar tells the School Admin about the trial running out, a renewal or
+  an overdue payment, and tells everybody when the school has gone read-only.
+- The School Admin has **Subscription & billing** (`/subscription`: plan, usage against limits,
+  modules, invoices with PDFs, plan change, Razorpay checkout when it is set up) and **Help &
+  support** (`/support`: tickets with the platform team).
+
+`VITE_DEMO_SUPERADMIN_EMAIL` and `VITE_DEMO_SUPERADMIN_PASSWORD` prefill the console's sign-in
+form for demonstrations; leave them empty anywhere else.
+
 ## Modules
 
 | Module | Routes | Notes |
@@ -73,7 +111,10 @@ misconfigured deploy fails immediately instead of surfacing as a confusing 404.
 | `features/dashboard` | `/dashboard` | The landing screen, shaped by who is looking: admin, principal, teacher, student and parent views over one route, with permission-filtered cards, charts, lists and a recent-activity feed |
 | `features/notifications` | `/notifications`, `/notifications/preferences` | The per-user inbox behind the top-bar bell: unread count, full history with filters, per-kind email and SMS opt-in, and a record of how every copy went out |
 | `features/auth` | `/login`, `/forgot-password`, `/reset-password/:token`, `/profile` | Sanctum sign-in, one-click demo accounts, password reset/change, profile, signed-in devices |
-| `features/roles` | `/roles`, `/roles/create`, `/roles/:id/edit`, `/permissions` | Spatie roles CRUD, resource × action permission matrix |
+| `features/roles` | `/roles`, `/roles/create`, `/roles/:id/edit`, `/permissions` | Spatie roles CRUD, resource × action permission matrix, sensitive fields hidden per role |
+| `features/users` | `/users`, `/access-log` | Sign-in accounts with several roles each, personal permission overrides and class / section / subject scope, and the log of every access change |
+| `features/saas` | `/subscription`, `/support`, `/support/:id` (school); `/signup`, `/login` (website) | The school's plan, usage, invoices and support tickets; the plan banner and module gating; the website's sign-up and school finder |
+| `features/platform` | `/superadmin/*` | The Super Admin console (see above) |
 | `features/settings` | `/settings/{profile,address,sessions,regional,email,sms}` | School profile, logo, academic sessions, timezone/currency, SMTP, SMS |
 | `features/students` | `/students`, `/students/admission`, `/students/:id/*` | Admission wizard, profile tabs, guardians, medical, documents, ID card, exports |
 | `features/teachers` | `/teachers`, `/teachers/new`, `/teachers/:id/*` | Profile, qualifications, experience, subjects & classes, documents, exports |
@@ -87,7 +128,8 @@ misconfigured deploy fails immediately instead of surfacing as a confusing 404.
 | `features/library` | `/library/{catalogue,issue,return,loans,fines,categories}`, `/library/catalogue/:id` | Catalogue of titles and their physical copies, Code 39 barcodes and label sheets, an issue and a return desk, loans, renewals and overdue fines |
 | `features/timetable` | `/timetable/{classes,teachers,rooms,periods}` | The period grid, the room register, and one slot table read three ways: a section's week, a teacher's week and a room's allocation — with teacher, room and workload clash detection |
 | `features/exams` | `/exams`, `/exams/new`, `/exams/:id`, `/exams/:id/papers/:paperId/marks`, `/exams/:id/results`, `/exams/:id/report-cards/:studentId` | Exam schedule with clash detection, batched marks entry, results derived from the marks, grades, ranked publication and printable report cards |
-| `features/fees` | `/fees/{collect,payments,dues,structures,types,discounts}` | Fee catalogue, structures with instalments, collection, receipts, discounts, fines, due reports |
+| `features/fees` | `/fees/{collect,day-book,payments,dues,structures,types,discounts}` | The office fee counter (search, tick dues, one-off charges, any mode, printed two-copy receipts, WhatsApp), the day book with cash counting and handover, fee catalogue, structures with instalments, discounts, fines, due reports |
+| `features/expenses` | `/expenses` | The expense book: vouchers by head of account, the principal's approval, printed payment vouchers, period totals and exports |
 | `features/attendance` | `/attendance/{students,teachers,staff,reports,holidays,devices}` | Daily marking for all three populations, monthly reports, holiday calendar, QR & biometric capture |
 | `features/leave` | `/leave/{applications,balances,reports,types}`, `/leave/applications/:id` | Student, teacher and staff leave in one register, the approval workflow, entitlement balances that count pending days, and usage reports — approved leave is what locks an attendance row |
 | `features/analytics` | `/analytics/:domain` | Correlation, segmentation and risk over the same data reports aggregates: what moves results, who is at risk, how arrears age, which classes are outliers — plus the AI-ready feature contract |
@@ -267,23 +309,39 @@ The user resource must include `roles` and `permissions` as string arrays (Spati
   using the permission set captured at sign-in.
 - Permissions are seeded, never created through the UI; `/permissions` is a read-only reference.
 
+- **Hidden fields.** A role can be kept from seeing groups of sensitive details (contact, ID
+  numbers, medical, family background, salary). The server blanks them out of every answer —
+  the picker on the role form only records the choice.
+- **Per person, the School Admin can add or take away permissions and set an access scope**
+  (classes, sections, subjects) from the Users form. Only the School Admin sees those sections;
+  the API refuses them from anybody else. The Users list shows "+2 extra · −1 taken away" and
+  "Limited to Class 9-B" under each person's roles.
+- **Access log** (`/access-log`): every change to roles, a person's roles, overrides, scope and
+  sign-in status, searchable, with who made it and when.
+
 Required backend endpoints:
 
 ```
 GET    /roles                   ?page&per_page&search&sort_by&sort_dir → paginated
 GET    /roles?per_page=all                                             → { data: role[] }
 GET    /roles/{id}                                → { data: role & { permissions: string[] } }
-POST   /roles                   { name, permissions[] }                → { data: role }
-PUT    /roles/{id}              { name, permissions[] }                → { data: role }
-DELETE /roles/{id}                                                     → 204
+POST   /roles                   { name, permissions[], hidden_fields[] } → { data: role }
+PUT    /roles/{id}              { name, permissions[], hidden_fields[] } → { data: role }
+DELETE /roles/{id}                                                     → 200
 GET    /permissions             ?per_page=all&with_roles=1             → { data: permission[] }
+PUT    /users/{id}              { …, granted_permissions[], revoked_permissions[],
+                                  access_scope: { class_ids[], section_ids[], subject_ids[] } | null }
+GET    /access-log              ?search                                → { data: entry[] }
 ```
 
 The role resource needs `is_system`, `users_count` and `permissions_count`. The API must
 reject renaming or deleting system roles — the UI hides those actions, but that is advisory.
 
-Roles seeded: `super-admin`, `school-admin`, `principal`, `vice-principal`, `teacher`,
-`accountant`, `receptionist`, `librarian`, `staff`, `parent`, `student` (see `types/auth.ts`).
+Roles seeded, in the quotation's order: School Admin (`super-admin`), Principal, Vice
+Principal, Academic Coordinator / HOD, Exam Coordinator, Class Teacher, Subject Teacher
+(`teacher`), Accountant, HR Manager, Admission Officer / Front Office (`receptionist`),
+Librarian, Transport Manager, Hostel Warden, Support Staff (`staff`), Parent and Student (see
+`types/auth.ts`). `school-admin` is kept only for schools created before these sixteen.
 
 ### School settings
 
@@ -614,6 +672,29 @@ application twice, cancelling leave that has started, and deleting leave that ha
 - **Fines stop accruing once a due is settled**, and non-cash modes require a transaction
   reference — it is the only trace that the money moved.
 
+**The office fee counter** (`/fees/collect`) is where a parent pays at the window:
+
+- Search by the student's name, admission number, or the father's name or phone (↑ ↓ Enter;
+  F2 jumps back to the search). The account comes up with the father's name, phone and roll
+  number, and everything due by today already ticked.
+- Tick what is being paid — this quarter, or only the books charge — and the money goes to
+  exactly those dues (`due_ids`), still oldest first among them. **Add a charge** puts a one-off
+  item (books, uniform, ID card, TC fee) on the account; it can be taken off until money is put
+  against it.
+- Modes are buttons: Cash, UPI, Cheque / DD (number, bank, cheque date), Card, Bank transfer,
+  Online. For cash, "Cash handed over" works out the change to return.
+- **Collect & print** issues the receipt and opens it: print two copies on one A4 sheet (parent's
+  and school's, with a cut line), download the PDF, or send it to the parent on WhatsApp (a
+  `wa.me` link — no gateway needed). The receipt carries the letterhead, father's name, roll
+  number, "received from", the amount in words (lakh / crore), how it was paid and the balance
+  left.
+
+**The day book** (`/fees/day-book`) is one day at the counter, for one cashier or all of them:
+receipts and money by mode, cancelled receipts, the day's expenses, and the cash that should be
+in the drawer. At closing time the cashier counts notes (₹500 … ₹10) and coins against it; the
+closing records the difference and who closed. Printed with signature lines for the handover,
+or exported to Excel / PDF.
+
 Required backend endpoints:
 
 ```
@@ -621,16 +702,40 @@ GET/POST/PUT/DELETE  /fees/types[/{id}]        ?per_page=all&status=active for o
 GET/POST/PUT/DELETE  /fees/discounts[/{id}]
 GET/POST/PUT/DELETE  /fees/structures[/{id}]
 GET    /fees/students/{id}/account                         → { data: account + dues }
-POST   /fees/payments  { student_id, amount, mode, reference, discount_id, fine_amount, paid_at }
+POST   /fees/students/{id}/charges  { label, amount, due_date }      → { data: account }
+DELETE /fees/students/{id}/charges/{dueId}                            → { data: account }
+POST   /fees/payments  { student_id, amount, mode, reference, discount_id, fine_amount, paid_at,
+                         due_ids?, received_from?, bank_name?, instrument_date? }
 GET    /fees/payments ?search&mode&status  ·  GET /fees/payments/{id}
 POST   /fees/payments/{id}/cancel  { reason }
 GET    /fees/payments/{id}/receipt                         → PDF
+GET    /fees/day-book ?date&collector  ·  GET /fees/day-book/export ?date&collector&format=
+POST   /fees/day-book/close  { date, collector, denominations: { "500": 12, … }, coins, remarks }
 GET    /fees/reports/dues ?…filters   ·  GET /fees/reports/dues/export ?format=
 ```
 
 The account endpoint must return the full instalment list with gross/discount/fine/paid/balance
 per due. Deleting a fee type, discount or structure that is in use must return 409. Collecting
 more than the outstanding balance must return 422.
+
+### Expenses
+
+What the school pays out (`/expenses`): every bill gets a voucher number (`EXP-2026-00001`), a
+head of account (electricity, fuel, repairs, stationery, events …), who was paid and how. The
+accountant records (`expenses.create`); the principal approves or rejects (`expenses.approve`) —
+an approver's own entries are approved at once. A voucher awaiting approval can be edited; an
+approved one can only be cancelled with a reason, so the books keep it. Expenses count in the
+day book from the day they are paid. The page totals the chosen period by head, prints a payment
+voucher with signature lines, and exports to Excel / PDF. Categories are managed in place and
+retired rather than deleted once used.
+
+```
+GET    /expenses ?search&from&to&category_id&status&mode   → paginated, plus { totals }
+POST   /expenses  ·  PUT /expenses/{id}  ·  DELETE /expenses/{id}
+POST   /expenses/{id}/approve  ·  /reject { reason }  ·  /cancel { reason }
+GET    /expenses/export ?…filters&format=
+GET/POST/PUT/DELETE  /expenses/categories[/{id}]
+```
 
 ### Homework
 
