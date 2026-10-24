@@ -1,27 +1,36 @@
 import { ArrowLeft, GraduationCap } from 'lucide-react';
-import { Suspense } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Suspense, useState } from 'react';
+import { Link, Outlet, useOutletContext } from 'react-router-dom';
 
 import { PATHS } from '@/app/router/paths';
 import { Spinner } from '@/components/ui/Spinner';
 import { env } from '@/config/env';
 import { useSchool } from '@/features/saas/SchoolContext';
+import { cn } from '@/lib/cn';
+
+interface AuthLayoutContext {
+  setWide: (wide: boolean) => void;
+}
+
+export function useAuthLayoutContext(): AuthLayoutContext {
+  return useOutletContext<AuthLayoutContext>();
+}
 
 /**
  * Centred, chrome-free shell for guest screens (login, password reset).
  *
  * Branded with the school whose address this is, so a parent can see they
- * are signing in to the right one. One narrow column by default; a page that
- * needs more room — the sign-in page with demo accounts beside the form —
- * marks its root with `data-wide`.
+ * are signing in to the right one. Pages that need a wider container (the
+ * demo accounts showcase) call `setWide(true)` via the outlet context.
  */
 export function AuthLayout() {
   const { code, info } = useSchool();
   const name = info?.name ?? env.appName;
+  const [wide, setWide] = useState(false);
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-sm has-[[data-wide]]:max-w-4xl">
+      <div className={cn('w-full transition-all duration-300', wide ? 'max-w-5xl' : 'max-w-sm')}>
         <Link
           to={PATHS.login}
           className="mx-auto mb-8 flex w-fit flex-col items-center rounded-lg text-center"
@@ -52,7 +61,7 @@ export function AuthLayout() {
             </div>
           }
         >
-          <Outlet />
+          <Outlet context={{ setWide } satisfies AuthLayoutContext} />
         </Suspense>
       </div>
 

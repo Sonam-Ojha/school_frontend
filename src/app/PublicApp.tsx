@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { RouteErrorBoundary } from '@/components/feedback/RouteErrorBoundary';
 
@@ -18,6 +18,22 @@ function createPublicRouter() {
           lazy: async () => ({ Component: (await import('@/features/landing/pages/LandingPage')).default }),
         },
         {
+          path: '/features',
+          lazy: async () => ({ Component: (await import('@/features/landing/pages/FeaturesPage')).default }),
+        },
+        {
+          path: '/pricing',
+          lazy: async () => ({ Component: (await import('@/features/landing/pages/PricingPage')).default }),
+        },
+        {
+          path: '/about',
+          lazy: async () => ({ Component: (await import('@/features/landing/pages/AboutPage')).default }),
+        },
+        {
+          path: '/contact',
+          lazy: async () => ({ Component: (await import('@/features/landing/pages/ContactPage')).default }),
+        },
+        {
           path: '/signup',
           lazy: async () => ({ Component: (await import('@/features/saas/pages/SignupPage')).default }),
         },
@@ -25,7 +41,6 @@ function createPublicRouter() {
           path: '/login',
           lazy: async () => ({ Component: (await import('@/features/saas/pages/FindSchoolPage')).default }),
         },
-        { path: '/pricing', element: <Navigate to={{ pathname: '/', hash: '#pricing' }} replace /> },
         {
           path: '*',
           lazy: async () => ({ Component: (await import('@/features/saas/pages/WebsiteNotFoundPage')).default }),

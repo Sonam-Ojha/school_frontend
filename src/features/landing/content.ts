@@ -53,11 +53,11 @@ import { ROLES } from '@/types/auth';
  */
 
 export const NAV_LINKS = [
-  { id: 'modules', label: 'Modules' },
-  { id: 'roles', label: 'Who it is for' },
-  { id: 'pricing', label: 'Pricing' },
-  { id: 'highlights', label: 'Why us' },
-  { id: 'contact', label: 'Book a demo' },
+  { id: 'modules', label: 'Features', href: '/features' },
+  { id: 'roles', label: 'Who it\'s for', href: '/#roles' },
+  { id: 'pricing', label: 'Pricing', href: '/pricing' },
+  { id: 'highlights', label: 'Why us', href: '/#highlights' },
+  { id: 'contact', label: 'Book a demo', href: '/contact' },
 ] as const;
 
 export interface Stat {

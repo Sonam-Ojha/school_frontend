@@ -20,42 +20,57 @@ const SIDEBAR: ReadonlyArray<{ label: string; icon: LucideIcon }> = [
   { label: 'Library', icon: Library },
 ];
 
-// Literal class names, so Tailwind can see them.
-const CARDS: ReadonlyArray<{ label: string; icon: LucideIcon; figure: string; meter: string }> = [
-  { label: 'Students', icon: GraduationCap, figure: 'w-14', meter: 'w-4/5' },
-  { label: 'Fees collected', icon: Wallet, figure: 'w-20', meter: 'w-3/5' },
-  { label: 'Present today', icon: CalendarCheck, figure: 'w-12', meter: 'w-11/12' },
-  { label: 'Leave to decide', icon: CalendarOff, figure: 'w-8', meter: 'w-1/4' },
+const CARDS: ReadonlyArray<{ label: string; icon: LucideIcon; figure: string; meter: string; color: string }> = [
+  { label: 'Students', icon: GraduationCap, figure: 'w-14', meter: 'w-4/5', color: 'bg-brand-500' },
+  { label: 'Fees collected', icon: Wallet, figure: 'w-20', meter: 'w-3/5', color: 'bg-emerald-500' },
+  { label: 'Present today', icon: CalendarCheck, figure: 'w-12', meter: 'w-11/12', color: 'bg-violet-500' },
+  { label: 'Leave pending', icon: CalendarOff, figure: 'w-8', meter: 'w-1/4', color: 'bg-amber-500' },
 ];
 
-const BARS = ['h-[55%]', 'h-[72%]', 'h-[64%]', 'h-[86%]', 'h-[78%]', 'h-[94%]'] as const;
+const BARS = [
+  { height: 'h-[55%]', active: false },
+  { height: 'h-[72%]', active: false },
+  { height: 'h-[64%]', active: false },
+  { height: 'h-[86%]', active: false },
+  { height: 'h-[78%]', active: false },
+  { height: 'h-[94%]', active: true },
+] as const;
 
 /**
- * A drawing of the dashboard for the hero — its shape, not a screenshot. The
- * figures are deliberately blank bars: the real numbers are one sign-in away,
- * and invented ones would only be decoration pretending to be data.
+ * A premium drawing of the dashboard for the hero — its shape, not a screenshot.
+ * Deliberately blank bars: the real numbers are one sign-in away.
  */
 export function AppPreview() {
   return (
     <div aria-hidden className="relative select-none">
-      <div className="absolute -inset-4 rounded-[2rem] bg-brand-200/40 blur-2xl" />
+      {/* Outer glow */}
+      <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-brand-600/30 via-purple-600/20 to-brand-600/10 blur-2xl" />
 
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-overlay">
-        <div className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-4 py-3">
-          <span className="size-2.5 rounded-full bg-slate-300" />
-          <span className="size-2.5 rounded-full bg-slate-300" />
-          <span className="size-2.5 rounded-full bg-slate-300" />
-          <span className="ml-3 h-5 flex-1 rounded-md bg-white ring-1 ring-slate-200" />
+      {/* Browser chrome */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-slate-900 shadow-[0_24px_64px_rgba(0,0,0,0.6)]">
+        {/* Title bar */}
+        <div className="flex items-center gap-1.5 border-b border-white/10 bg-slate-800/80 px-4 py-3">
+          <span className="size-2.5 rounded-full bg-red-500/80" />
+          <span className="size-2.5 rounded-full bg-amber-500/80" />
+          <span className="size-2.5 rounded-full bg-emerald-500/80" />
+          <div className="ml-3 flex h-5 flex-1 items-center gap-1 rounded-md bg-slate-700/80 px-2">
+            <div className="size-2 rounded-full bg-emerald-400" />
+            <span className="text-[9px] text-slate-400">school.erp.app/dashboard</span>
+          </div>
         </div>
 
+        {/* App layout */}
         <div className="flex">
-          <div className="hidden w-36 shrink-0 space-y-0.5 border-r border-slate-200 bg-slate-50/70 p-2.5 sm:block">
+          {/* Sidebar */}
+          <div className="hidden w-36 shrink-0 space-y-0.5 border-r border-white/10 bg-slate-800/50 p-2.5 sm:block">
             {SIDEBAR.map(({ label, icon: Icon }, index) => (
               <div
                 key={label}
                 className={cn(
                   'flex items-center gap-2 rounded-md px-2 py-1.5 text-xs',
-                  index === 0 ? 'bg-brand-50 font-medium text-brand-700' : 'text-slate-500',
+                  index === 0
+                    ? 'bg-brand-600/20 font-medium text-brand-300 ring-1 ring-brand-500/30'
+                    : 'text-slate-400',
                 )}
               >
                 <Icon className="size-3.5 shrink-0" />
@@ -64,34 +79,56 @@ export function AppPreview() {
             ))}
           </div>
 
-          <div className="min-w-0 flex-1 space-y-3 p-4">
-            <div className="grid grid-cols-2 gap-3">
-              {CARDS.map(({ label, icon: Icon, figure, meter }) => (
-                <div key={label} className="rounded-lg border border-slate-200 p-3">
+          {/* Main content */}
+          <div className="min-w-0 flex-1 space-y-3 bg-slate-900 p-4">
+            {/* Greeting bar */}
+            <div className="flex items-center justify-between">
+              <div className="h-3 w-24 rounded-full bg-slate-700" />
+              <div className="h-5 w-16 rounded-md bg-brand-600/40" />
+            </div>
+
+            {/* KPI cards */}
+            <div className="grid grid-cols-2 gap-2">
+              {CARDS.map(({ label, icon: Icon, figure, meter, color }) => (
+                <div
+                  key={label}
+                  className="rounded-xl border border-white/8 bg-slate-800/60 p-3 transition-all"
+                >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-[11px] font-medium text-slate-500">{label}</span>
-                    <Icon className="size-3.5 shrink-0 text-brand-500" />
+                    <span className="truncate text-[10px] font-medium text-slate-400">{label}</span>
+                    <Icon className="size-3 shrink-0 text-slate-500" />
                   </div>
-                  <div className={cn('mt-2.5 h-5 rounded bg-slate-200', figure)} />
-                  <div className="mt-3 h-1.5 rounded-full bg-slate-100">
-                    <div className={cn('h-full rounded-full bg-brand-500', meter)} />
+                  <div className={cn('mt-2 h-4 rounded-md bg-slate-700', figure)} />
+                  <div className="mt-2.5 h-1 rounded-full bg-slate-700">
+                    <div className={cn('h-full rounded-full', meter, color)} />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-lg border border-slate-200 p-3">
-              <span className="text-[11px] font-medium text-slate-500">Attendance this week</span>
-              <div className="mt-3 flex h-20 items-end gap-2">
-                {BARS.map((height, index) => (
+            {/* Chart */}
+            <div className="rounded-xl border border-white/8 bg-slate-800/60 p-3">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-[10px] font-medium text-slate-400">Attendance this week</span>
+                <div className="h-2 w-10 rounded-full bg-slate-700" />
+              </div>
+              <div className="flex h-16 items-end gap-1.5">
+                {BARS.map(({ height, active }, index) => (
                   <div
-                    key={height}
+                    key={index}
                     className={cn(
-                      'flex-1 rounded-t',
+                      'flex-1 rounded-t-sm transition-all',
                       height,
-                      index === BARS.length - 1 ? 'bg-brand-500' : 'bg-brand-200',
+                      active
+                        ? 'bg-gradient-to-t from-brand-600 to-brand-400'
+                        : 'bg-slate-700',
                     )}
                   />
+                ))}
+              </div>
+              <div className="mt-2 flex justify-between">
+                {['M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                  <span key={i} className="flex-1 text-center text-[8px] text-slate-500">{d}</span>
                 ))}
               </div>
             </div>

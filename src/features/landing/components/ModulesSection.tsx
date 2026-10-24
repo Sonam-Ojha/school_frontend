@@ -1,27 +1,46 @@
+import { cn } from '@/lib/cn';
+
 import { MODULES } from '../content';
 
 import { Section } from './Section';
+
+const ICON_COLORS = [
+  'bg-brand-500/10 text-brand-400',
+  'bg-emerald-500/10 text-emerald-400',
+  'bg-violet-500/10 text-violet-400',
+  'bg-amber-500/10 text-amber-400',
+  'bg-pink-500/10 text-pink-400',
+  'bg-cyan-500/10 text-cyan-400',
+];
 
 export function ModulesSection() {
   return (
     <Section
       id="modules"
-      eyebrow="What is inside"
+      eyebrow="What's inside"
       title="Every office in the school, in one application"
       lead="Each module is a working part of the same system: a student admitted at the front desk is the student the teacher marks present, the accountant bills and the librarian lends to."
     >
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MODULES.map(({ name, summary, icon: Icon }) => (
+        {MODULES.map(({ name, summary, icon: Icon }, i) => (
           <li
             key={name}
-            className="flex gap-3.5 rounded-card border border-slate-200 bg-white p-4 shadow-card"
+            className="group relative flex gap-3.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md hover:shadow-brand-100/50"
           >
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-              <Icon className="size-[18px]" aria-hidden />
+            {/* Hover glow */}
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100 bg-gradient-to-br from-brand-50/50 to-transparent" />
+
+            <span
+              className={cn(
+                'relative flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110',
+                ICON_COLORS[i % ICON_COLORS.length],
+              )}
+            >
+              <Icon className="size-5" aria-hidden />
             </span>
-            <div className="min-w-0">
+            <div className="relative min-w-0">
               <h3 className="text-sm font-semibold text-slate-900">{name}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">{summary}</p>
+              <p className="mt-1 text-sm leading-relaxed text-slate-500">{summary}</p>
             </div>
           </li>
         ))}
