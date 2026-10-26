@@ -50,7 +50,7 @@ import {
   TicketStatusBadge,
 } from '../components/shared';
 import { usePlatformAuth } from '../store';
-import type { PlatformInvoice, PlatformSchool, SchoolPatch } from '../types';
+import type { PlatformInvoice, PlatformPlan, PlatformSchool, SchoolPatch } from '../types';
 
 /** `/superadmin/schools/:id`: one school's profile, subscription, limits, billing, tickets and log. */
 export default function SchoolDetailPage() {
@@ -307,7 +307,7 @@ export default function SchoolDetailPage() {
           </Card>
 
           <Card>
-            <CardHeader title="Plan modules" description="Switched on by the plan" />
+            <CardHeader title="Included in the plan" description="Modules and services the plan switches on" />
             <CardBody className="flex flex-wrap gap-2">
               {Object.entries(MODULE_LABELS).map(([key, label]) => (
                 <Badge key={key} tone={school.modules.includes(key as never) ? 'success' : 'neutral'}>
@@ -456,8 +456,9 @@ function InvoiceTable({ invoices, onPay }: { invoices: PlatformInvoice[]; onPay?
 }
 
 /** The school's details, plan, dates, limits and demo switches, editable by Sales and the owner. */
-function SchoolForm({ school, plans, canEdit }: { school: PlatformSchool; plans: Array<{ id: number; name: string }>; canEdit: boolean }) {
+function SchoolForm({ school, plans, canEdit }: { school: PlatformSchool; plans: PlatformPlan[]; canEdit: boolean }) {
   const queryClient = useQueryClient();
+  const meta = useQuery({ queryKey: platformKeys.meta(), queryFn: ({ signal }) => platformApi.meta(signal), staleTime: 10 * 60_000 });
   const initial = (): SchoolPatch => ({
     name: school.name,
     contact_name: school.contact_name,
@@ -468,6 +469,7 @@ function SchoolForm({ school, plans, canEdit }: { school: PlatformSchool; plans:
     region: school.region,
     gstin: school.gstin,
     custom_domain: school.custom_domain ?? '',
+    account_manager_id: school.account_manager?.id ?? null,
     plan_id: school.plan?.id,
     billing_cycle: school.billing_cycle,
     trial_ends_at: school.trial_ends_at ? toDateInputValue(school.trial_ends_at) : null,
@@ -501,6 +503,9 @@ function SchoolForm({ school, plans, canEdit }: { school: PlatformSchool; plans:
     },
   });
   const error = (field: string) => fieldError(save.error, field);
+  // What the chosen plan offers: an own domain and an account manager are Enterprise services.
+  const chosenPlan = plans.find((plan) => plan.id === form.plan_id);
+  const offers = (key: 'custom_domain' | 'account_manager') => Boolean(chosenPlan?.modules.includes(key));
 
   return (
     <Card>
@@ -524,8 +529,48 @@ function SchoolForm({ school, plans, canEdit }: { school: PlatformSchool; plans:
           <Field label="School name" error={error('name')}>
             <Input value={form.name ?? ''} onChange={(event) => set('name', event.target.value)} />
           </Field>
-          <Field label="Custom domain" error={error('custom_domain')} hint="Point its DNS at the platform, e.g. erp.greenwood.edu.in">
-            <Input value={form.custom_domain ?? ''} onChange={(event) => set('custom_domain', event.target.value)} placeholder="erp.school.edu.in" />
+          <Field
+            label="Custom domain"
+            error={error('custom_domain')}
+            hint={
+              offers('custom_domain')
+                ? 'Point its DNS at the platform, e.g. erp.greenwood.edu.in'
+                : form.custom_domain
+                  ? 'Not in use: this plan does not include an own domain'
+                  : 'Needs a plan with an own domain (Enterprise)'
+            }
+          >
+            <Input
+              value={form.custom_domain ?? ''}
+              onChange={(event) => set('custom_domain', event.target.value)}
+              placeholder="erp.school.edu.in"
+              disabled={!offers('custom_domain') && !form.custom_domain}
+            />
+          </Field>
+          <Field
+            label="Account manager"
+            error={error('account_manager_id')}
+            hint={
+              offers('account_manager')
+                ? 'Shown to the school; its new tickets go to this person'
+                : form.account_manager_id
+                  ? 'Not in use: this plan does not include an account manager'
+                  : 'Needs a plan with an account manager (Enterprise)'
+            }
+          >
+            <select
+              className={SELECT_CLASS}
+              value={form.account_manager_id ?? ''}
+              onChange={(event) => set('account_manager_id', event.target.value ? Number(event.target.value) : null)}
+              disabled={!offers('account_manager') && !form.account_manager_id}
+            >
+              <option value="">None</option>
+              {(meta.data?.team ?? []).map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.name}
+                </option>
+              ))}
+            </select>
           </Field>
           <Field label="Contact name" error={error('contact_name')}>
             <Input value={form.contact_name ?? ''} onChange={(event) => set('contact_name', event.target.value)} />

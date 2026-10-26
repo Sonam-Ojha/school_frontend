@@ -75,6 +75,8 @@ export default function SupportPage() {
   const isDemo = useAuthStore((state) => state.user?.is_demo ?? false);
   const [creating, setCreating] = useState(false);
   const support = subscription.data?.support;
+  const priority = Boolean(support?.priority);
+  const accountManager = subscription.data?.account_manager ?? null;
   const waiting = (tickets.data ?? []).filter((ticket) => ticket.status === 'waiting').length;
 
   return (
@@ -101,12 +103,28 @@ export default function SupportPage() {
           </Alert>
         )}
 
+        {accountManager && (
+          <Alert tone="info" title="Your account manager">
+            {accountManager.name} (
+            <a href={`mailto:${accountManager.email}`} className="font-medium underline">
+              {accountManager.email}
+            </a>
+            ) looks after your school. New tickets go straight to them.
+          </Alert>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="flex items-start gap-3 rounded-card border border-slate-200 bg-white p-4">
             <MessagesSquare className="mt-0.5 size-5 shrink-0 text-brand-600" aria-hidden />
             <div className="text-sm">
-              <p className="font-medium text-slate-900">Tickets</p>
-              <p className="text-slate-500">Best for anything that needs a record — answered within one working day.</p>
+              <p className="font-medium text-slate-900">
+                Tickets{priority && <span className="ml-1.5 align-middle"><Badge tone="info">Priority support</Badge></span>}
+              </p>
+              <p className="text-slate-500">
+                {priority
+                  ? 'Your plan includes priority support: your open tickets go to the top of the support team’s queue.'
+                  : 'Best for anything that needs a record — answered within one working day.'}
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3 rounded-card border border-slate-200 bg-white p-4">

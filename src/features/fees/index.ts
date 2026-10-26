@@ -1,11 +1,10 @@
 /** Public surface of the fee management module. */
 
-export { CollectPaymentModal } from './components/CollectPaymentModal';
 export { DiscountFormModal } from './components/DiscountFormModal';
 export { FeeStructureForm } from './components/FeeStructureForm';
 export { FeeTypeFormModal } from './components/FeeTypeFormModal';
 export { PaymentReceipt } from './components/PaymentReceipt';
-export { StudentDuesCard } from './components/StudentDuesCard';
+export { AddChargeModal } from './components/AddChargeModal';
 export {
   buildDiscountColumns,
   buildDueReportColumns,
@@ -27,15 +26,21 @@ export {
 
 export {
   accountKeys,
+  dayBookKeys,
   dueKeys,
   paymentKeys,
+  useAddCharge,
   useCancelPayment,
+  useCloseDay,
   useCollectPayment,
+  useDayBook,
   useDownloadReceipt,
   useDueReport,
+  useExportDayBook,
   useExportDueReport,
   usePayment,
   usePayments,
+  useRemoveCharge,
   useStudentAccount,
 } from './hooks/useCollection';
 
@@ -82,6 +87,7 @@ export type {
   FeeStructureDetail,
   FeeType,
   Installment,
+  DayBook,
   Payment,
   StudentDue,
   StudentFeeAccount,

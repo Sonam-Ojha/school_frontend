@@ -28,7 +28,8 @@ export type Area =
 export const PLATFORM_SEGMENT = 'superadmin';
 
 /** Pages of the public website. */
-export const PUBLIC_SEGMENTS = new Set(['', 'signup', 'login', 'pricing']);
+/** The website's own pages. A school can never take one of these as its code. */
+export const PUBLIC_SEGMENTS = new Set(['', 'signup', 'login', 'pricing', 'features', 'about', 'contact']);
 
 /** The first segment of every page inside a school, so an old link without a code is recognised. */
 const SCHOOL_SECTIONS = new Set(

@@ -3,9 +3,9 @@ import { PATHS } from '@/app/router/paths';
 import type { ModuleKey } from './types';
 
 /**
- * Modules a plan may leave out. Everything not listed here — students,
- * teachers, staff, fees, attendance, exams, timetable, homework, messages,
- * reports and settings — is part of every plan.
+ * What a plan may leave out. Everything not listed here — students,
+ * teachers, staff, fees, attendance, exams, timetable, homework, messages
+ * by SMS and email, reports and settings — is part of every plan.
  */
 export const MODULE_LABELS: Record<ModuleKey, string> = {
   assignments: 'Assignments',
@@ -16,12 +16,17 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
   analytics: 'Analytics',
   hostel: 'Hostel',
   devices: 'Biometric & GPS devices',
+  whatsapp: 'WhatsApp messages',
+  priority_support: 'Priority support',
+  custom_domain: 'Own domain',
+  account_manager: 'Account manager',
 };
 
 export const ALL_MODULES = Object.keys(MODULE_LABELS) as ModuleKey[];
 
 /** The module a page belongs to, by the start of its path, for pages a plan can leave out. */
 const MODULE_BY_PATH: Array<[string, ModuleKey]> = [
+  [`${PATHS.reports}/payroll`, 'payroll'],
   [PATHS.attendanceDevices, 'devices'],
   [PATHS.transportTracking, 'devices'],
   [PATHS.assignments, 'assignments'],

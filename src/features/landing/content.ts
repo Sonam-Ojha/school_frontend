@@ -2,7 +2,7 @@ import {
   Award,
   Backpack,
   Banknote,
-  BedDouble,
+
   Bell,
   BookOpen,
   BookOpenCheck,
@@ -249,7 +249,7 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
   },
   {
     role: ROLES.classTeacher,
-    summary: 'Their own class: the register, students' details, homework, report cards and parents.',
+    summary: `Their own class: the register, students' details, homework, report cards and parents.`,
     icon: Users,
   },
   {
@@ -269,7 +269,7 @@ export const ROLE_SUMMARIES: RoleSummary[] = [
   },
   {
     role: ROLES.receptionist,
-    summary: 'Admissions and the front desk: new students, ID cards, notices and parents' calls.',
+    summary: `Admissions and the front desk: new students, ID cards, notices and parents' calls.`,
     icon: ConciergeBell,
   },
   {
@@ -318,7 +318,7 @@ export const HIGHLIGHTS: Highlight[] = [
   },
   {
     title: 'The right screen for each person',
-    body: 'Sixteen ready-made roles, plus your own. A class teacher sees their own class; parents and students see only their own child's attendance, fees and results.',
+    body: `Sixteen ready-made roles, plus your own. A class teacher sees their own class; parents and students see only their own child's attendance, fees and results.`,
     icon: Users,
   },
   {
@@ -328,7 +328,7 @@ export const HIGHLIGHTS: Highlight[] = [
   },
   {
     title: 'Fast on any connection',
-    body: 'Pages answer in milliseconds, on a school office computer or a parent's phone on mobile data.',
+    body: `Pages answer in milliseconds, on a school office computer or a parent's phone on mobile data.`,
     icon: Zap,
   },
   {
@@ -338,7 +338,7 @@ export const HIGHLIGHTS: Highlight[] = [
   },
   {
     title: 'Parents hear from you',
-    body: 'Notices and messages by email, SMS and WhatsApp through your own accounts, with delivery recorded for each family.',
+    body: 'Notices and messages by email, SMS and (on Growth and Enterprise) WhatsApp through your own accounts, with delivery recorded for each family.',
     icon: Mail,
   },
 ];
@@ -358,12 +358,13 @@ export const FLOW: FlowStep[] = [
   },
   {
     title: 'Node.js API',
-    body: 'Express checks the sign-in token, then the permission, then applies the school's rules to data held in memory.',
+    body: 'Express checks the sign-in token, then the permission, then applies the schools rules to data held in memory.',
     icon: Server,
   },
   {
     title: 'MySQL',
     body: '63 tables hold the durable copy, with companion SQL views so the data can be reported on with ordinary queries.',
+
     icon: Database,
   },
 ];

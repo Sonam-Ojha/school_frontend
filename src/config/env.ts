@@ -32,10 +32,10 @@ export const env = {
   appUrl: (raw.VITE_APP_URL ?? raw.VITE_API_BASE_URL.replace(/\/api\/?$/, '')).replace(/\/+$/, ''),
   authMode: raw.VITE_AUTH_MODE,
   appName: raw.VITE_APP_NAME,
-  demoSuperAdmin: {
-    email: raw.VITE_DEMO_SUPERADMIN_EMAIL?.trim() ?? '',
-    password: raw.VITE_DEMO_SUPERADMIN_PASSWORD ?? '',
-  },
+  // Development only: a production build never pre-fills a password, whatever its .env says.
+  demoSuperAdmin: import.meta.env.DEV
+    ? { email: raw.VITE_DEMO_SUPERADMIN_EMAIL?.trim() ?? '', password: raw.VITE_DEMO_SUPERADMIN_PASSWORD ?? '' }
+    : { email: '', password: '' },
   isDev: import.meta.env.DEV,
   isProd: import.meta.env.PROD,
 } as const;

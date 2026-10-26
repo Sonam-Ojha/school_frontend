@@ -12,7 +12,6 @@ export const schoolSessionKey = (code: string): string => `school-erp.auth.${cod
 export const STORAGE_KEYS = {
   auth: schoolCode ? schoolSessionKey(schoolCode) : 'school-erp.auth',
   platformAuth: 'school-erp.platform-auth',
-  ui: 'school-erp.ui',
 } as const;
 
 /** Matches Laravel's default `perPage` options so the API never rejects a value. */

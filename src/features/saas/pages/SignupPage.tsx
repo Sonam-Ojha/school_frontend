@@ -20,7 +20,7 @@ import { formatDate } from '@/lib/format';
 import { applyServerErrors } from '@/lib/formErrors';
 import { queryKeys } from '@/lib/queryKeys';
 
-import { CycleToggle, PlanCard, yearlySaving } from '../components/PlanCard';
+import { CycleToggle, highestStudentLimit, PlanCard, yearlySaving } from '../components/PlanCard';
 import { WebsiteShell } from '../components/WebsiteShell';
 import { saasService } from '../services/saasService';
 import type { SignupResult } from '../types';
@@ -206,6 +206,7 @@ export default function SignupPage() {
                     key={plan.id}
                     plan={plan}
                     cycle={cycle}
+                    studentsAbove={highestStudentLimit(plans.data)}
                     selected={planId === plan.id}
                     onSelect={() => form.setValue('plan_id', plan.id, { shouldValidate: true })}
                   />

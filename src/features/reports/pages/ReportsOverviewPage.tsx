@@ -5,6 +5,7 @@ import { PATHS, toPath } from '@/app/router/paths';
 import { Alert } from '@/components/ui/Alert';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { usePlanModules } from '@/features/saas/hooks/useSubscription';
 import { formatDateTime } from '@/lib/format';
 
 import { ReportChart } from '../components/ReportChart';
@@ -22,6 +23,9 @@ import { useReportsOverview } from '../hooks/useReports';
  */
 export default function ReportsOverviewPage() {
   const { data, isLoading, error } = useReportsOverview();
+  // Payroll figures only on a plan with payroll.
+  const modules = usePlanModules();
+  const shown = (family: string) => family !== 'payroll' || modules === null || modules.includes('payroll');
 
   if (error) {
     return (
@@ -48,7 +52,7 @@ export default function ReportsOverviewPage() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-2">
-        {data.panels.map((panel) => {
+        {data.panels.filter((panel) => shown(panel.family)).map((panel) => {
           const family = familyOf(panel.family);
 
           return (

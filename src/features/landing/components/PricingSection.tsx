@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { CycleToggle, PlanCard, yearlySaving } from '@/features/saas/components/PlanCard';
+import { CycleToggle, highestStudentLimit, PlanCard, yearlySaving } from '@/features/saas/components/PlanCard';
 import { saasService } from '@/features/saas/services/saasService';
 import type { BillingCycle } from '@/features/saas/types';
 import { queryKeys } from '@/lib/queryKeys';
@@ -27,7 +27,7 @@ export function PricingSection({ trialDays }: { trialDays: number }) {
       id="pricing"
       eyebrow="Pricing"
       title="Simple plans that grow with your school"
-      lead={`Every plan starts with a ${trialDays}-day free trial of everything. Prices are per school, not per user — invite every teacher, parent and student at no extra cost.`}
+      lead={`Every plan starts with a ${trialDays}-day free trial of everything in it. Prices are per school, not per user — teachers, parents and students sign in at no extra cost.`}
       className="bg-white"
     >
       <div className="mb-8 flex justify-center">
@@ -49,6 +49,7 @@ export function PricingSection({ trialDays }: { trialDays: number }) {
               key={plan.id}
               plan={plan}
               cycle={cycle}
+              studentsAbove={highestStudentLimit(plans.data)}
               action={
                 <Button
                   fullWidth

@@ -15,7 +15,6 @@ import { ModulesSection } from '../components/ModulesSection';
 import { PricingSection } from '../components/PricingSection';
 import { RolesSection } from '../components/RolesSection';
 import { StackSection } from '../components/StackSection';
-import { TestimonialsSection } from '../components/TestimonialsSection';
 
 // Named in full so Tailwind generates it; applied to <html> only while this
 // page is open, and not at all for somebody who has asked for less motion.
@@ -63,7 +62,6 @@ export default function LandingPage() {
         <RolesSection />
         <HowItWorksSection />
         <StackSection />
-        <TestimonialsSection />
         <PricingSection trialDays={trialDays} />
         <HighlightsSection />
         <ContactSection

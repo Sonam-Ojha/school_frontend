@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Alert } from '@/components/ui/Alert';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -63,7 +64,10 @@ export default function TicketsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Support tickets" description="Raised by school admins from their app’s Help & Support page. Replies reach them there." />
+      <PageHeader
+        title="Support tickets"
+        description="Raised by school admins from their app’s Help & Support page. Replies reach them there. Open tickets from schools with priority support are listed first."
+      />
 
       <div className="grid gap-6 lg:grid-cols-[22rem_1fr]">
         <Card>
@@ -93,9 +97,10 @@ export default function TicketsPage() {
                       {entry.number} · {entry.school?.name ?? 'Deleted school'}
                     </p>
                     <p className="truncate text-sm font-medium text-slate-900">{entry.subject}</p>
-                    <div className="mt-1 flex gap-1.5">
+                    <div className="mt-1 flex flex-wrap gap-1.5">
                       <TicketStatusBadge status={entry.status} />
                       <PriorityBadge priority={entry.priority} />
+                      {entry.priority_support && <Badge tone="info">Priority support</Badge>}
                     </div>
                   </button>
                 </li>
@@ -115,8 +120,9 @@ export default function TicketsPage() {
                     {ticket.number} · {ticket.category} · raised by {ticket.raised_by.name} ({ticket.raised_by.email})
                   </p>
                   <h2 className="text-lg font-semibold text-slate-900">{ticket.subject}</h2>
-                  <p className="text-sm">
+                  <p className="flex flex-wrap items-center gap-2 text-sm">
                     <SchoolLink school={ticket.school} />
+                    {ticket.priority_support && <Badge tone="info">Priority support: answer first</Badge>}
                   </p>
                 </div>
                 {manage && (

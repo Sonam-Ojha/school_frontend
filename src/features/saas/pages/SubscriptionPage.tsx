@@ -10,6 +10,7 @@ import {
   Phone,
   Receipt,
   Sparkles,
+  UserRound,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -29,7 +30,7 @@ import { formatBytes, formatCurrency, formatDate } from '@/lib/format';
 import { useAuthStore } from '@/store/authStore';
 
 import { ChangePlanModal } from '../components/ChangePlanModal';
-import { CycleToggle, formatRupees, monthlyPrice, PlanCard, yearlySaving } from '../components/PlanCard';
+import { CycleToggle, formatRupees, highestStudentLimit, monthlyPrice, PlanCard, yearlySaving } from '../components/PlanCard';
 import { UsageMeter } from '../components/UsageMeter';
 import { useDownloadInvoice, usePayInvoice, usePlans, useSubscription } from '../hooks/useSubscription';
 import { graceDaysLeft, INVOICE_BADGES, plural, STATE_BADGES } from '../labels';
@@ -100,7 +101,7 @@ function PlanSummary({ subscription }: { subscription: Subscription }) {
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">Modules on this plan</p>
+          <p className="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">Included in this plan</p>
           <ul className="flex flex-wrap gap-2">
             {ALL_MODULES.map((module) => {
               const included = subscription.modules.includes(module);
@@ -120,10 +121,23 @@ function PlanSummary({ subscription }: { subscription: Subscription }) {
             })}
           </ul>
           <p className="mt-2 text-xs text-slate-500">
-            Students, teachers, staff, fees, attendance, examinations, timetable, homework, messages, reports and settings are
-            part of every plan.
+            Students, teachers, staff, fees, attendance, examinations, timetable, homework, SMS and email messages, reports and
+            settings are part of every plan.
           </p>
         </div>
+
+        {subscription.account_manager && (
+          <div className="flex gap-3 rounded-lg bg-brand-50 px-4 py-3 text-sm text-slate-700">
+            <UserRound className="mt-0.5 size-4 shrink-0 text-brand-600" aria-hidden />
+            <p>
+              Your account manager is <span className="font-medium text-slate-900">{subscription.account_manager.name}</span> (
+              <a href={`mailto:${subscription.account_manager.email}`} className="text-brand-700 hover:underline">
+                {subscription.account_manager.email}
+              </a>
+              ). Support tickets you raise go straight to them.
+            </p>
+          </div>
+        )}
       </CardBody>
     </Card>
   );
@@ -256,6 +270,7 @@ function ChangePlan({ subscription }: { subscription: Subscription }) {
                   key={plan.id}
                   plan={plan}
                   cycle={cycle}
+                  studentsAbove={highestStudentLimit(plans.data)}
                   label={isCurrent ? 'Your plan' : undefined}
                   selected={isCurrent}
                   action={

@@ -121,7 +121,7 @@ export function AppPreview() {
 
             {/* KPI cards */}
             <div className="grid grid-cols-2 gap-2">
-              {CARDS.map(({ label, icon: Icon, figure, meter, color, value }) => (
+              {CARDS.map(({ label, icon: Icon, meter, color, value }) => (
                 <div
                   key={label}
                   className="rounded-xl border border-white/8 bg-slate-800/60 p-3 transition-all"

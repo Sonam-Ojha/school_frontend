@@ -1,5 +1,6 @@
 /** The platform's view of things, as the website and the schools see it. */
 
+/** What a plan may or may not include: eight parts of the app, then four services around it. */
 export type ModuleKey =
   | 'assignments'
   | 'leave'
@@ -8,7 +9,11 @@ export type ModuleKey =
   | 'payroll'
   | 'analytics'
   | 'hostel'
-  | 'devices';
+  | 'devices'
+  | 'whatsapp'
+  | 'priority_support'
+  | 'custom_domain'
+  | 'account_manager';
 
 export type BillingCycle = 'monthly' | 'yearly';
 
@@ -115,7 +120,10 @@ export interface Subscription {
     key_id: string | null;
     instructions: string;
   };
-  support: { email: string; phone: string };
+  /** `priority`: the plan includes priority support. */
+  support: { email: string; phone: string; priority?: boolean };
+  /** The school's own contact in the platform team, on a plan with an account manager. */
+  account_manager?: { name: string; email: string } | null;
 }
 
 export interface InvoiceLine {

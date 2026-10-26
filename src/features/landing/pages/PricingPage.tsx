@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { CycleToggle, PlanCard, yearlySaving } from '@/features/saas/components/PlanCard';
+import { CycleToggle, highestStudentLimit, PlanCard, yearlySaving } from '@/features/saas/components/PlanCard';
 import { saasService } from '@/features/saas/services/saasService';
 import type { BillingCycle } from '@/features/saas/types';
 import { queryKeys } from '@/lib/queryKeys';
@@ -18,11 +18,15 @@ import { useEntry } from '@/features/landing/hooks/useEntry';
 const FAQ = [
   {
     q: 'Is there a free trial?',
-    a: 'Yes — every plan starts with a 14-day free trial with all modules enabled. No credit card needed.',
+    a: 'Yes — every plan starts with a 14-day free trial of everything in that plan. No credit card needed.',
   },
   {
     q: 'Is pricing per user or per school?',
-    a: 'Per school. Invite every teacher, parent and student at no extra cost. Only the school pays.',
+    a: 'Per school. Teachers, parents and students sign in at no extra cost, up to the login limit shown on each plan. Only the school pays.',
+  },
+  {
+    q: 'What does each plan add?',
+    a: 'Starter is the core school system with assignments and leave. Growth adds library, transport, HR & payroll, analytics, WhatsApp messages and priority support. Enterprise adds hostel, biometric attendance, live bus GPS, your own domain and a dedicated account manager. A school only sees what its plan includes.',
   },
   {
     q: 'Can I change plans later?',
@@ -43,11 +47,11 @@ const FAQ = [
 ];
 
 const INCLUDED = [
-  'All modules enabled on day 1',
-  'Unlimited users (teachers, parents, students)',
+  'Students, staff, fees, attendance & exams',
+  'Teacher, parent and student logins',
   'Your own school address',
-  'WhatsApp, Email & SMS',
-  'Reports & analytics',
+  'Email & SMS to parents',
+  'Reports',
   'PDF receipts & report cards',
   'Daily database backup',
   '12-month support included',
@@ -94,8 +98,8 @@ export default function PricingPage() {
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-lg text-slate-400">
-            Every plan starts with a 14-day free trial of everything. Prices are per school, not
-            per user — invite every teacher, parent and student at no extra cost.
+            Every plan starts with a 14-day free trial of everything in it. Prices are per school,
+            not per user — teachers, parents and students sign in at no extra cost.
           </p>
         </div>
       </section>
@@ -122,6 +126,7 @@ export default function PricingPage() {
                   key={plan.id}
                   plan={plan}
                   cycle={cycle}
+                  studentsAbove={highestStudentLimit(plans.data)}
                   action={
                     <Button
                       fullWidth
@@ -156,8 +161,8 @@ export default function PricingPage() {
                 No hidden charges
               </h2>
               <p className="mt-3 text-slate-600">
-                Every plan comes with the full system. You pay for the capacity you need, not for
-                the features you use.
+                Every plan comes with the core school system. Bigger plans add modules, WhatsApp,
+                priority support and room for more students.
               </p>
               <ul className="mt-8 grid gap-3 sm:grid-cols-2">
                 {INCLUDED.map((item) => (

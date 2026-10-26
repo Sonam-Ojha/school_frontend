@@ -93,6 +93,8 @@ export interface PlatformSchool {
   country: string;
   gstin: string;
   custom_domain: string | null;
+  /** Who is set as its account manager, whether or not its plan includes one. */
+  account_manager?: { id: number; name: string; email: string } | null;
   url: string;
   demo_login: boolean;
   simulate: boolean;
@@ -234,6 +236,8 @@ export interface PlatformTicket {
   status: TicketStatus;
   raised_by: { name: string; email: string; user_id: number };
   school: SchoolRef | null;
+  /** The school's plan includes priority support: its open tickets come first. */
+  priority_support?: boolean;
   assigned_to: { id: number; name: string } | null;
   messages: TicketMessage[];
   last_message_at: string;
@@ -302,6 +306,8 @@ export interface RevenueReport {
 export interface PlatformMeta {
   modules: Array<{ key: ModuleKey; name: string; description: string }>;
   roles: Array<{ key: PlatformRole; label: string; description: string }>;
+  /** Active members of the team, for choosing a school's account manager. */
+  team?: Array<{ id: number; name: string; role: PlatformRole }>;
   gst_states: Array<{ code: string; name: string }>;
   online_payments: boolean;
   platform_mail: boolean;
@@ -363,6 +369,7 @@ export type SchoolPatch = Partial<{
   region: string;
   gstin: string;
   custom_domain: string;
+  account_manager_id: number | null;
   plan_id: number;
   billing_cycle: BillingCycle;
   status: SchoolStatus;
