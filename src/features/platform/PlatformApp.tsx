@@ -21,6 +21,8 @@ function createPlatformRouter() {
     [
       {
         errorElement: <RouteErrorBoundary />,
+        // Shown on the first load while the page's code arrives (without it the router warns and shows nothing).
+        hydrateFallbackElement: <FullPageLoader />,
         children: [
           {
             element: <GuestOnly />,

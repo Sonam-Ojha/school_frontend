@@ -1,6 +1,6 @@
 /** The platform's view of things, as the website and the schools see it. */
 
-/** What a plan may or may not include: eight parts of the app, then four services around it. */
+/** What a plan may or may not include: nine parts of the app, then four services around it. */
 export type ModuleKey =
   | 'assignments'
   | 'leave'
@@ -10,6 +10,7 @@ export type ModuleKey =
   | 'analytics'
   | 'hostel'
   | 'devices'
+  | 'assistant'
   | 'whatsapp'
   | 'priority_support'
   | 'custom_domain'

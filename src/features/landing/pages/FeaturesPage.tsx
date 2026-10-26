@@ -56,7 +56,7 @@ export default function FeaturesPage() {
               size="lg"
               onClick={startTrial}
               rightIcon={<ArrowRight className="size-4" />}
-              className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_24px_rgba(99,102,241,0.4)]"
+              className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_24px_rgba(87,80,251,0.4)]"
             >
               Start free trial
             </Button>

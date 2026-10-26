@@ -1,4 +1,6 @@
-import { GraduationCap, Mail, Phone, Globe } from 'lucide-react';
+import { Mail, Phone, Globe } from 'lucide-react';
+
+import { BrandLogo } from '@/components/brand/BrandLogo';
 
 import { env } from '@/config/env';
 import { cn } from '@/lib/cn';
@@ -27,15 +29,12 @@ export function LandingFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand column */}
           <div className="lg:col-span-2">
-            <a href="/" className="inline-flex items-center gap-2.5">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-brand-600 text-white shadow-[0_0_16px_rgba(99,102,241,0.4)]">
-                <GraduationCap className="size-5" aria-hidden />
-              </span>
-              <span className="text-base font-semibold text-white">{env.appName}</span>
+            <a href="/" className="inline-flex items-center" aria-label={`${env.appName} — home`}>
+              <BrandLogo tone="dark" />
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
-              A cloud-based, multi-tenant School Management ERP built for Indian schools. One
-              system for every office, every role, every device.
+              {env.appName} is cloud school management built for Indian schools. One system for
+              every office, every role, every device.
             </p>
             <div className="mt-6 space-y-2.5">
               <a

@@ -23,6 +23,7 @@ interface SidebarNavProps {
 export function SidebarNav({ rail = false, onNavigate }: SidebarNavProps) {
   const hasAnyRole = useAuthStore((state) => state.hasAnyRole);
   const hasAnyPermission = useAuthStore((state) => state.hasAnyPermission);
+  const isPortal = useAuthStore((state) => Boolean(state.user?.is_portal));
   const modules = usePlanModules();
 
   const inPlan = (item: NavItem) => {
@@ -33,6 +34,7 @@ export function SidebarNav({ rail = false, onNavigate }: SidebarNavProps) {
   const isVisible = (item: NavItem) =>
     (!item.roles || hasAnyRole(item.roles)) &&
     (!item.permissions || hasAnyPermission(item.permissions)) &&
+    (!item.staffOnly || !isPortal) &&
     inPlan(item);
 
   return (

@@ -4,6 +4,7 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { area, platformUrl, schoolUrl } from '@/app/tenant';
 import { Button } from '@/components/ui/Button';
 import { env } from '@/config/env';
+import { isStaleBuildError, reloadForNewBuild } from '@/lib/staleBuild';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -33,6 +34,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
+    // A part of the app whose code is from an older version: reload for the current one.
+    if (isStaleBuildError(error) && reloadForNewBuild()) return;
     this.props.onError?.(error, info);
     if (env.isDev) {
       console.error('[ErrorBoundary]', error, info.componentStack);
@@ -71,7 +74,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             variant="outline"
             onClick={() =>
               window.location.assign(
-                area.kind === 'school' ? schoolUrl(area.code, '/dashboard') : area.kind === 'platform' ? platformUrl('/dashboard') : '/',
+                area.kind === 'school'
+                  ? schoolUrl(area.code, '/dashboard')
+                  : area.kind === 'platform'
+                    ? platformUrl('/dashboard')
+                    : '/',
               )
             }
           >

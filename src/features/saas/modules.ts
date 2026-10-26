@@ -16,6 +16,7 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
   analytics: 'Analytics',
   hostel: 'Hostel',
   devices: 'Biometric & GPS devices',
+  assistant: 'AI assistant',
   whatsapp: 'WhatsApp messages',
   priority_support: 'Priority support',
   custom_domain: 'Own domain',
@@ -36,6 +37,7 @@ const MODULE_BY_PATH: Array<[string, ModuleKey]> = [
   [PATHS.payroll, 'payroll'],
   [PATHS.analytics, 'analytics'],
   [PATHS.hostel, 'hostel'],
+  [PATHS.assistant, 'assistant'],
 ];
 
 export function moduleOfPath(path: string): ModuleKey | null {

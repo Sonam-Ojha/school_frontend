@@ -18,6 +18,7 @@ import {
   History,
   KeyRound,
   LayoutDashboard,
+  Sparkles,
   LayoutGrid,
   Library,
   LifeBuoy,
@@ -63,6 +64,8 @@ export interface NavItem {
   roles?: string[];
   /** Visible only with one of these Spatie permissions. */
   permissions?: string[];
+  /** Hidden from family accounts (parents and students). */
+  staffOnly?: boolean;
 }
 
 export interface NavSection {
@@ -77,7 +80,10 @@ export interface NavSection {
  */
 export const NAVIGATION: NavSection[] = [
   {
-    items: [{ label: 'Dashboard', to: PATHS.dashboard, icon: LayoutDashboard }],
+    items: [
+      { label: 'Dashboard', to: PATHS.dashboard, icon: LayoutDashboard },
+      { label: 'AI assistant', to: PATHS.assistant, icon: Sparkles, staffOnly: true },
+    ],
   },
   {
     title: 'People',

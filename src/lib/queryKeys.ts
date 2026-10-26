@@ -28,6 +28,10 @@ export const queryKeys = {
     tickets: () => [...queryKeys.saas.all, 'tickets'] as const,
     ticket: (id: number) => [...queryKeys.saas.all, 'tickets', id] as const,
   },
+  /** The AI assistant (`/assistant/…`). */
+  assistant: {
+    status: () => ['assistant', 'status'] as const,
+  },
 } as const;
 
 /**

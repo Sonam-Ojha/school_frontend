@@ -8,7 +8,7 @@ const envSchema = z.object({
   VITE_API_BASE_URL: z.string().url('VITE_API_BASE_URL must be a valid URL'),
   VITE_APP_URL: z.string().url('VITE_APP_URL must be a valid URL').optional(),
   VITE_AUTH_MODE: z.enum(['token', 'cookie']).default('token'),
-  VITE_APP_NAME: z.string().min(1).default('School ERP'),
+  VITE_APP_NAME: z.string().min(1).default('KLIMB School ERP'),
   /**
    * For a presentation: the Super Admin sign-in page arrives with these filled
    * in. Leave both empty in a real deployment — anything here ends up in the

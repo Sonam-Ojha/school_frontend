@@ -12,7 +12,6 @@ import {
   Menu,
   Receipt,
   Settings,
-  ShieldCheck,
   Users,
   X,
   type LucideIcon,
@@ -26,6 +25,7 @@ import { Reveal } from '@/components/layout/Reveal';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { BrandMark } from '@/components/brand/BrandLogo';
 import { env } from '@/config/env';
 import { cn } from '@/lib/cn';
 
@@ -86,14 +86,12 @@ const ALL_TABS = PLATFORM_TABS.flatMap((group) => group.tabs);
 
 function Brand({ rail }: { rail: boolean }) {
   return (
-    <div className="flex items-center">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white">
-        <ShieldCheck className="size-5" aria-hidden />
-      </span>
+    <div className="flex items-center" title={`${env.appName} — Super Admin`}>
+      <BrandMark />
       <Reveal rail={rail}>
         <span className="block pr-2 pl-2.5">
-          <span className="block text-sm font-semibold whitespace-nowrap text-slate-900">Super Admin</span>
-          <span className="block text-xs whitespace-nowrap text-slate-500">{env.appName} platform</span>
+          <span className="block text-sm font-semibold whitespace-nowrap text-slate-900">{env.appName}</span>
+          <span className="block text-xs whitespace-nowrap text-slate-500">Super Admin console</span>
         </span>
       </Reveal>
     </div>

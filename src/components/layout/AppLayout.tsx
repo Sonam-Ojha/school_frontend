@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Spinner } from '@/components/ui/Spinner';
+import { AssistantWidget } from '@/features/assistant/components/AssistantWidget';
 import { ModuleUnavailable } from '@/features/saas/components/ModuleUnavailable';
 import { SubscriptionBanner } from '@/features/saas/components/SubscriptionBanner';
 import { usePlanModules } from '@/features/saas/hooks/useSubscription';
@@ -48,6 +49,9 @@ export function AppLayout() {
           </ErrorBoundary>
         </main>
       </div>
+
+      {/* The assistant, a tap away on every page. */}
+      <AssistantWidget />
     </div>
   );
 }

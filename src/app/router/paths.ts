@@ -14,6 +14,8 @@ export const PATHS = {
   // Authenticated
   dashboard: '/dashboard',
   profile: '/profile',
+  /** Ask about students, attendance, fees and results, typed or spoken. Staff only; a plan module. */
+  assistant: '/assistant',
 
   // Notifications — personal, so no permission gates them.
   notifications: '/notifications',

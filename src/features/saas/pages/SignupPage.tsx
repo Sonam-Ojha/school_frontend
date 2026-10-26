@@ -173,7 +173,7 @@ export default function SignupPage() {
           Start your {trialDays}-day free trial
         </h1>
         <p className="mt-2 text-slate-600">
-          Every module, your own private workspace, no card needed. Your school is ready in under a minute.
+          Everything in the plan you pick, your own private workspace, no card needed. Your school is ready in under a minute.
         </p>
       </div>
 

@@ -69,7 +69,7 @@ export function AppPreview() {
           <span className="size-2.5 rounded-full bg-emerald-500/80" />
           <div className="ml-3 flex h-5 flex-1 items-center gap-1 rounded-md bg-slate-700/80 px-2">
             <div className="size-2 rounded-full bg-emerald-400" />
-            <span className="text-[9px] text-slate-400">school.erp.app/dashboard</span>
+            <span className="text-[9px] text-slate-400">klimb school erp · /your-school/dashboard</span>
           </div>
           {/* Bell notification */}
           <div className="relative ml-2">

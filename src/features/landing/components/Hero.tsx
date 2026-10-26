@@ -58,7 +58,7 @@ export function Hero({ demoSchool, trialDays }: HeroProps) {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm font-medium text-brand-300 backdrop-blur-sm">
             <Sparkles className="size-3.5" aria-hidden />
-            Cloud School ERP · Built for India
+            KLIMB School ERP · Built for India
           </div>
 
           <h1 className="mt-6 text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
@@ -82,7 +82,7 @@ export function Hero({ demoSchool, trialDays }: HeroProps) {
               size="lg"
               onClick={startTrial}
               rightIcon={<ArrowRight className="size-4" aria-hidden />}
-              className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_24px_rgba(99,102,241,0.4)]"
+              className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_24px_rgba(87,80,251,0.4)]"
             >
               Start {trialDays}-day free trial
             </Button>

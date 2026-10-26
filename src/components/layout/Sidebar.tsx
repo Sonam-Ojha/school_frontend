@@ -1,4 +1,6 @@
-import { GraduationCap, X } from 'lucide-react';
+import { X } from 'lucide-react';
+
+import { BrandMark } from '@/components/brand/BrandLogo';
 import { useEffect } from 'react';
 
 import { Avatar } from '@/components/ui/Avatar';
@@ -25,15 +27,13 @@ function Brand({ rail }: { rail: boolean }) {
           className="size-9 shrink-0 rounded-lg border border-slate-200 bg-white object-contain p-0.5"
         />
       ) : (
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white">
-          <GraduationCap className="size-5" aria-hidden />
-        </span>
+        <BrandMark />
       )}
       <Reveal rail={rail}>
         <span className="block pr-2 pl-2.5">
           {/* A long school name is cut short so it cannot stretch the menu; the full name is the tooltip. */}
           <span className="block max-w-[13rem] truncate text-sm font-semibold whitespace-nowrap text-slate-900">{name}</span>
-          <span className="block text-xs whitespace-nowrap text-slate-500">{info?.city || 'School ERP'}</span>
+          <span className="block text-xs whitespace-nowrap text-slate-500">{info?.city || env.appName}</span>
         </span>
       </Reveal>
     </div>

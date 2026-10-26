@@ -11,6 +11,7 @@ import { FormInput } from '@/components/form/FormInput';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
+import { BRAND } from '@/components/brand/BrandLogo';
 import { env } from '@/config/env';
 import { ApiError } from '@/lib/apiError';
 import { applyServerErrors } from '@/lib/formErrors';
@@ -98,11 +99,9 @@ export default function PlatformLoginPage() {
     <div className="flex min-h-dvh flex-col items-center justify-center bg-slate-900 px-4 py-10">
       <div className={accounts.length > 0 ? 'w-full max-w-3xl' : 'w-full max-w-sm'}>
         <div className="mb-8 flex flex-col items-center text-center">
-          <span className="flex size-12 items-center justify-center rounded-xl bg-brand-500 text-white">
-            <ShieldCheck className="size-6" aria-hidden />
-          </span>
-          <h1 className="mt-3 text-lg font-semibold text-white">Super Admin</h1>
-          <p className="text-sm text-slate-400">{env.appName} platform console</p>
+          <img src={BRAND.logo} alt={BRAND.mark} className="h-12 w-auto rounded-lg" draggable={false} />
+          <h1 className="mt-4 text-lg font-semibold text-white">Super Admin</h1>
+          <p className="text-sm text-slate-400">{env.appName} · platform console</p>
         </div>
 
         <div className={accounts.length > 0 ? 'grid gap-6 md:grid-cols-2 md:items-start' : ''}>

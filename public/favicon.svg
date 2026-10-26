@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- KLIMB: a white K on the logo's indigo. -->
+  <rect width="64" height="64" rx="12" fill="#3B01D2" />
+  <path d="M15 13h11v15.2L39 13h13L36.6 30.4 53 51H40L29.8 37.5 26 41.7V51H15Z" fill="#fff" />
+</svg>

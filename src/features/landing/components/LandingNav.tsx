@@ -1,7 +1,8 @@
-import { GraduationCap, Menu, PlayCircle, X } from 'lucide-react';
+import { Menu, PlayCircle, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 import { env } from '@/config/env';
 import { cn } from '@/lib/cn';
 
@@ -33,11 +34,8 @@ export function LandingNav() {
     >
       <div className={cn(CONTAINER, 'flex h-16 items-center gap-3')}>
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2.5 rounded-lg">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-brand-600 text-white shadow-[0_0_16px_rgba(99,102,241,0.5)]">
-            <GraduationCap className="size-5" aria-hidden />
-          </span>
-          <span className="text-base font-semibold text-white">{env.appName}</span>
+        <a href="/" className="flex items-center rounded-lg" aria-label={`${env.appName} — home`}>
+          <BrandLogo tone="dark" />
         </a>
 
         {/* Desktop nav */}
@@ -64,7 +62,7 @@ export function LandingNav() {
           </a>
           <Button
             onClick={startTrial}
-            className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_16px_rgba(99,102,241,0.3)]"
+            className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_16px_rgba(87,80,251,0.3)]"
           >
             Start free trial
           </Button>

@@ -35,7 +35,7 @@ const VALUES = [
 ];
 
 const TIMELINE = [
-  { year: '2024', event: 'KLIMB AGENCY starts building the School ERP after hearing the same pain points from six different schools.' },
+  { year: '2024', event: 'KLIMB AGENCY starts building KLIMB School ERP after hearing the same pain points from six different schools.' },
   { year: 'Early 2025', event: 'First version with students, attendance and fee collection live in production.' },
   { year: 'Mid 2025', event: 'Payroll, library, transport, hostel and the parent portal added.' },
   { year: 'Late 2025', event: 'Examinations, report cards, analytics and the multi-tenant Super Admin console completed.' },
@@ -71,7 +71,7 @@ export default function AboutPage() {
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-400">
             KLIMB AGENCY is a technology studio focused on software that works the way the people who use
-            it actually work. The School ERP is our largest and most detailed product — designed with
+            it actually work. KLIMB School ERP is our largest and most detailed product — designed with
             input from principals, accountants, class teachers and parents.
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function AboutPage() {
             <p className="text-sm font-semibold text-brand-400">The team</p>
             <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">Built by KLIMB AGENCY</h2>
             <p className="mt-4 leading-relaxed text-slate-400">
-              We are a small, focused team of designers and engineers. The School ERP is designed and
+              We are a small, focused team of designers and engineers. KLIMB School ERP is designed and
               developed by us; we do not resell or rebrand a third-party system.
             </p>
             <div className="mt-8 space-y-3">

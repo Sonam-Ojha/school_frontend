@@ -26,7 +26,7 @@ const FAQ = [
   },
   {
     q: 'What does each plan add?',
-    a: 'Starter is the core school system with assignments and leave. Growth adds library, transport, HR & payroll, analytics, WhatsApp messages and priority support. Enterprise adds hostel, biometric attendance, live bus GPS, your own domain and a dedicated account manager. A school only sees what its plan includes.',
+    a: 'Starter is the core school system with assignments and leave. Growth adds library, transport, HR & payroll, analytics, WhatsApp messages and priority support. Enterprise adds hostel, biometric attendance, live bus GPS, the AI assistant (ask about any student’s attendance, fees or results by typing or speaking), your own domain and a dedicated account manager. A school only sees what its plan includes.',
   },
   {
     q: 'Can I change plans later?',

@@ -69,7 +69,7 @@ export function ClosingSection({ demoSchool, trialDays }: ClosingSectionProps) {
                 size="lg"
                 onClick={startTrial}
                 rightIcon={<ArrowRight className="size-4" aria-hidden />}
-                className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_32px_rgba(99,102,241,0.5)]"
+                className="bg-brand-600 hover:bg-brand-500 shadow-[0_0_32px_rgba(87,80,251,0.5)]"
               >
                 Start free trial
               </Button>

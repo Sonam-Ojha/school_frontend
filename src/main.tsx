@@ -2,7 +2,11 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from './app/App';
+import { reloadOnPreloadError } from './lib/staleBuild';
 import './styles/index.css';
+
+// After a new version is published, an open page reloads for the current files instead of failing.
+reloadOnPreloadError();
 
 const container = document.getElementById('root');
 

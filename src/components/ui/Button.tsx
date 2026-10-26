@@ -32,7 +32,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  /** Square button with no label — `aria-label` becomes required in practice. */
+  /**
+   * Square button with no label — `aria-label` becomes required in practice.
+   * The icon is `leftIcon`, or the children when there is none.
+   */
   iconOnly?: boolean;
   fullWidth?: boolean;
 }
@@ -72,7 +75,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {...rest}
     >
       {isLoading ? <Spinner size="sm" /> : leftIcon}
-      {!iconOnly && children}
+      {/* An icon-only button given its icon as children (`<Button iconOnly><Pencil /></Button>`) shows it. */}
+      {iconOnly ? (leftIcon || isLoading ? null : children) : children}
       {!isLoading && rightIcon}
     </button>
   );

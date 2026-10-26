@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+import { FullPageLoader } from '@/components/feedback/FullPageLoader';
 import { RouteErrorBoundary } from '@/components/feedback/RouteErrorBoundary';
 
 /**
@@ -12,6 +13,8 @@ function createPublicRouter() {
   return createBrowserRouter([
     {
       errorElement: <RouteErrorBoundary />,
+      // Shown on the first load while the page's code arrives (without it the router warns and shows nothing).
+      hydrateFallbackElement: <FullPageLoader />,
       children: [
         {
           path: '/',

@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
 
+import { FullPageLoader } from '@/components/feedback/FullPageLoader';
 import { RouteErrorBoundary } from '@/components/feedback/RouteErrorBoundary';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AuthLayout } from '@/components/layout/AuthLayout';
@@ -76,6 +77,14 @@ const protectedRoutes: RouteObject[] = [
   {
     path: PATHS.profile,
     lazy: async () => ({ Component: (await import('@/features/auth/pages/ProfilePage')).default }),
+  },
+  // The AI assistant: no permission gates it, because it can only read what
+  // the person asking may read anyway. The page itself turns family accounts away.
+  {
+    path: PATHS.assistant,
+    lazy: async () => ({
+      Component: (await import('@/features/assistant/pages/AssistantPage')).default,
+    }),
   },
   // Notifications sit beside the profile rather than behind a permission:
   // your own notifications are yours, and no right gates reading what you
@@ -1140,6 +1149,8 @@ export function createSchoolRouter(code: string) {
     [
       {
         errorElement: <RouteErrorBoundary />,
+        // Shown on the first load while the page's code arrives (without it the router warns and shows nothing).
+        hydrateFallbackElement: <FullPageLoader />,
         children: [
           {
             element: <PublicRoute />,
